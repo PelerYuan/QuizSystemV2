@@ -32,7 +32,7 @@ NewQuizSystem/
 │   ├── index.html              # Web HTML template
 │   ├── vite.config.js          # Vite configuration (includes local CORS proxy settings)
 │   └── package.json            # Frontend dependencies
-├── backend/                    # 🟢 Backend code (Node.js + Express)
+├── backend/                    # Backend code (Node.js + Express)
 │   ├── controllers/            # Route controllers (handles specific business logic)
 │   ├── models/                 # MongoDB data models (Schema definitions)
 │   ├── utils/                  # Backend utilities (e.g., error handling, configs)
