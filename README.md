@@ -1,4 +1,4 @@
-# 📝 New Quiz System 
+# 📝 Quiz System V2
 
 A modern, fully decoupled full-stack online examination and quiz management system. This project is a complete rewrite of the original Python template-based quiz system.
 
@@ -80,3 +80,4 @@ npm run dev
 ## 📄 Documentation Index
 
 - [How to contribute to the project](./CONTRIBUTING.md)
+- [Database schema](./docs/schema.md)
