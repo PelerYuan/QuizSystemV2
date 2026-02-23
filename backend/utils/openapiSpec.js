@@ -35,6 +35,23 @@ const spec = {
                     createdAt: { type: 'string', format: 'date-time' },
                     updatedAt: { type: 'string', format: 'date-time' }
                 }
+            },
+            Entrance: {
+                type: 'object',
+                properties: {
+                    id: { type: 'string', example: '65xyz987def4567890uvwxyz' },
+                    quizId: {
+                        type: 'object',
+                        description: 'Populated Quiz object containing at least the ID and name',
+                        example: { id: '65abc123def4567890abcdef', name: 'Midterm Python Fundamentals' }
+                    },
+                    accessCode: { type: 'string', example: 'ABCD', description: 'Auto-generated 4-character uppercase code' },
+                    name: { type: 'string', example: 'Monday Morning Session' },
+                    description: { type: 'string', example: 'For Class A students' },
+                    isActive: { type: 'boolean', example: true },
+                    createdAt: { type: 'string', format: 'date-time' },
+                    updatedAt: { type: 'string', format: 'date-time' }
+                }
             }
         }
     },
@@ -191,6 +208,104 @@ const spec = {
                     204: { description: 'Quiz successfully deleted (No Content)' },
                     401: { description: 'Token missing or invalid' },
                     404: { description: 'Quiz not found' }
+                }
+            }
+        },
+        '/api/entrances': {
+            get: {
+                summary: 'Get All Entrances',
+                description: 'Returns all exam sessions. The parent quizId is populated with the quiz name.',
+                tags: ['Entrance Management'],
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: 'Returns an array of entrances',
+                        content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Entrance' } } } }
+                    },
+                    401: { description: 'Token missing or invalid' }
+                }
+            },
+            post: {
+                summary: 'Create a New Exam Session',
+                description: 'Generates a new Entrance with an auto-generated 4-character accessCode.',
+                tags: ['Entrance Management'],
+                security: [{ bearerAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['quizId', 'name', 'isActive'],
+                                properties: {
+                                    quizId: { type: 'string', example: '65abc123def4567890abcdef' },
+                                    name: { type: 'string', example: 'New Exam Session' },
+                                    description: { type: 'string', example: 'Optional description' },
+                                    isActive: { type: 'boolean', example: true }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: {
+                        description: 'Entrance successfully created',
+                        content: { 'application/json': { schema: { $ref: '#/components/schemas/Entrance' } } }
+                    },
+                    400: { description: 'Validation error (missing strictly required fields)' },
+                    401: { description: 'Token missing or invalid' },
+                    404: { description: 'Referenced quiz not found' }
+                }
+            }
+        },
+        '/api/entrances/{id}': {
+            parameters: [
+                {
+                    name: 'id',
+                    in: 'path',
+                    required: true,
+                    description: 'The MongoDB ObjectId of the Entrance',
+                    schema: { type: 'string' }
+                }
+            ],
+            put: {
+                summary: 'Update / Toggle Entrance',
+                description: 'Allows partial updates to the Entrance, primarily used to toggle the `isActive` status.',
+                tags: ['Entrance Management'],
+                security: [{ bearerAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    name: { type: 'string', example: 'Updated Exam Name' },
+                                    description: { type: 'string', example: 'Updated description' },
+                                    isActive: { type: 'boolean', example: false }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: {
+                        description: 'Entrance successfully updated',
+                        content: { 'application/json': { schema: { $ref: '#/components/schemas/Entrance' } } }
+                    },
+                    401: { description: 'Token missing or invalid' },
+                    404: { description: 'Entrance not found' }
+                }
+            },
+            delete: {
+                summary: 'Delete an Entrance',
+                description: 'Deletes an entrance and cascades deletion to all associated student Submissions.',
+                tags: ['Entrance Management'],
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    204: { description: 'Entrance successfully deleted (No Content)' },
+                    401: { description: 'Token missing or invalid' },
+                    404: { description: 'Entrance not found' }
                 }
             }
         }
