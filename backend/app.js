@@ -2,6 +2,8 @@ const config = require('./utils/config')
 const express = require('express')
 
 const app = express()
+const { apiReference } = require('@scalar/express-api-reference')
+const openapiSpec = require('./utils/openapiSpec')
 const cors = require('cors')
 const logger = require('./utils/logger')
 const middleware = require('./utils/middleware')
@@ -25,6 +27,17 @@ mongoose.connect(config.MONGODB_URI)
 app.use(cors())
 app.use(express.json())
 app.use(middleware.tokenExtractor)
+
+app.use(
+    '/reference',
+    apiReference({
+        theme: 'moon',
+        spec: {
+            content: openapiSpec,
+        },
+    })
+)
+logger.info(`Live API document at http://localhost:${config.PORT}/reference`)
 
 app.use('/api/quizzes', quizzesRouter)
 app.use('/api/auth', authRouter)

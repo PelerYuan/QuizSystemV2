@@ -79,5 +79,15 @@ npm run dev
 
 ## 📄 Documentation Index
 
+**Core Documentation**
 - [How to contribute to the project](./CONTRIBUTING.md)
-- [Database schema](./docs/schema.md)
+
+**Data Models & Schemas**
+- [Database Schema](./docs/schema.md)
+- [Quiz Data Format Specification](./docs/quiz_format.md)
+- [Answer Data Format Specification](./docs/answer_format.md)
+
+**API & Routing**
+- [Frontend/Backend Routes](./docs/route.md)
+- [Static API Documentation](./docs/API.md)
+- [Interactive API Reference (Scalar)](http://localhost:3000/reference) *(Requires running server)*

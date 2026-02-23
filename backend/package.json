@@ -12,6 +12,7 @@
     "test": "cross-env NODE_ENV=test node --test"
   },
   "dependencies": {
+    "@scalar/express-api-reference": "^0.8.44",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
