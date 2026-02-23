@@ -11,6 +11,7 @@ const mongoose = require('mongoose')
 
 const quizzesRouter = require('./controllers/quizzes')
 const authRouter = require('./controllers/auth')
+const entranceRouter = require('./controllers/entrances')
 
 mongoose.set('strictQuery', false)
 
@@ -41,6 +42,7 @@ logger.info(`Live API document at http://localhost:${config.PORT}/reference`)
 
 app.use('/api/quizzes', quizzesRouter)
 app.use('/api/auth', authRouter)
+app.use('/api/entrances', entranceRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)

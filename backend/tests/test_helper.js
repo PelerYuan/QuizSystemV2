@@ -1,4 +1,5 @@
 const Quiz = require('../models/quiz')
+const Entrance = require('../models/entrance')
 
 // Mock data strictly follows the database Schema and the required JSON format
 const initialQuizzes = [
@@ -63,8 +64,31 @@ const nonExistingId = async () => {
     return quiz._id.toString()
 }
 
+// Fetch all entrances currently in the database
+const entrancesInDb = async () => {
+    const entrances = await Entrance.find({})
+    return entrances.map(e => e.toJSON())
+}
+
+// Generate an ID that is valid but does not exist in the Entrance collection
+const nonExistingEntranceId = async () => {
+    // Note: quizId doesn't matter here since we just want to generate and delete a valid Entrance ID
+    const entrance = new Entrance({
+        quizId: "123456789012345678901234", // Dummy ObjectId
+        accessCode: "TEMP",
+        name: "willremovethissoon",
+        isActive: false
+    })
+    await entrance.save()
+    await entrance.deleteOne()
+
+    return entrance._id.toString()
+}
+
 module.exports = {
     initialQuizzes,
     quizzesInDb,
-    nonExistingId
+    nonExistingId,
+    entrancesInDb,
+    nonExistingEntranceId
 }
