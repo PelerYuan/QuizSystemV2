@@ -2,35 +2,17 @@ const quizzesRouter = require('express').Router()
 const Quiz = require('../models/quiz')
 const Entrance = require('../models/entrance')
 const Submission = require('../models/submission')
-const jwt = require('jsonwebtoken')
-const config = require('../utils/config')
+const middleware = require('../utils/middleware')
 const {response, request} = require("express");
 
-const verifyAdmin = (request, response) => {
-    if (!request.token) {
-        response.status(401).json({error: 'token missing'})
-        return false
-    }
-    const decodedToken = jwt.verify(request.token, config.SECRET)
-    if (!decodedToken.role || decodedToken.role !== 'admin') {
-        response.status(401).json({error: 'token invalid'})
-        return false
-    }
-    return true
-}
+quizzesRouter.use(middleware.verifyAdmin)
 
 quizzesRouter.get('/', async (request, response) => {
-    if (!verifyAdmin(request, response))
-        return
-
     const quizzes = await Quiz.find({})
     response.json(quizzes)
 })
 
 quizzesRouter.get('/:id', async (request, response) => {
-    if (!verifyAdmin(request, response))
-        return
-
     const quiz = await Quiz.findById(request.params.id)
     if (quiz) {
         response.json(quiz)
@@ -40,9 +22,6 @@ quizzesRouter.get('/:id', async (request, response) => {
 })
 
 quizzesRouter.post('/', async (request, response) => {
-    if (!verifyAdmin(request, response))
-        return
-
     const body = request.body
 
     const quiz = new Quiz({
@@ -56,9 +35,6 @@ quizzesRouter.post('/', async (request, response) => {
 })
 
 quizzesRouter.put('/:id', async (request, response) => {
-    if (!verifyAdmin(request, response))
-        return
-
     const body = request.body
 
     if (!body.name || !body.questions) {
@@ -80,9 +56,6 @@ quizzesRouter.put('/:id', async (request, response) => {
 })
 
 quizzesRouter.delete('/:id', async (request, response) => {
-    if (!verifyAdmin(request, response))
-        return
-
     const quizId = request.params.id
     const deletedQuiz = await Quiz.findByIdAndDelete(quizId)
     if (!deletedQuiz) {
