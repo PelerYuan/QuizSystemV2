@@ -37,6 +37,7 @@ app.use(
         },
     })
 )
+logger.info(`Live API document at http://localhost:${config.PORT}/reference`)
 
 app.use('/api/quizzes', quizzesRouter)
 app.use('/api/auth', authRouter)
