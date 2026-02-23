@@ -1,0 +1,33 @@
+### 1. Test successful login (using the correct password)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "password": "123456"
+}
+
+
+### 2. Test failed login (using the wrong password)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "password": "wrong_password_test"
+}
+
+
+### 3. Test getting current status /auth/me
+# Note: You need to run the "successful login" request first,
+# copy the returned token, and replace the placeholder below.
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzE4MTM4NjAsImV4cCI6MTc3MTgxNzQ2MH0.h0CJf-lvpA0V5vupaKohJM705IBGBLS1sfjJaqhC8NI
+
+
+### 4. Test logout /auth/logout
+# Similarly, replace the placeholder with your actual token.
+POST http://localhost:3000/api/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzE4MTM4NjAsImV4cCI6MTc3MTgxNzQ2MH0.h0CJf-lvpA0V5vupaKohJM705IBGBLS1sfjJaqhC8NI
+
+
+### 5. Test accessing a protected route without a token (Should return 401 Unauthorized)
+GET http://localhost:3000/api/auth/me
