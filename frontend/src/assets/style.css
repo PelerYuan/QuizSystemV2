@@ -1,0 +1,391 @@
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #6b6b6b;
+  --border: #e5e5e5;
+  --panel: #ffffff;
+  --panel-alt: #fafafa;
+  --shadow: rgba(0, 0, 0, 0.04);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --max-width: 980px;
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --line: 1.6;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  line-height: var(--line);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+a:hover {
+  border-bottom-color: currentColor;
+}
+
+img,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.app-container {
+  margin-left: 200px;
+  margin-right: 200px;
+  margin-top: 30px;
+}
+
+
+
+.App,
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+  width: calc(100% - 2 * var(--space-5));
+  max-width: var(--max-width);
+  margin: var(--space-5) auto;
+  padding: var(--space-7) var(--space-5);
+}
+
+.header {
+  border-bottom: 1px solid var(--border);
+  width: calc(100% - 2 * var(--space-5));
+  padding: var(--space-4) var(--space-5);
+  margin: var(--space-5) auto 0;
+}
+
+.quiz-header {
+  font-weight: bolder;
+  border: 2px solid #000;
+  display: inline-block;
+  width: fit-content;
+  padding: 10px;
+  font-size: 1.25rem;
+}
+
+.header a {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.footer {
+  border-top: 1px solid var(--border);
+  width: calc(100% - 2 * var(--space-5));
+  padding: var(--space-4) var(--space-5);
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 auto var(--space-5);
+}
+
+.welcome-box,
+.important-note,
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: 0 1px 0 var(--shadow);
+}
+
+.welcome-box {
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.welcome-head h2 {
+  margin: 0 0 var(--space-2) 0;
+}
+
+.welcome-head p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.welcome-content {
+  margin-top: var(--space-4);
+}
+
+.important-note {
+  padding: var(--space-5);
+  background: var(--panel-alt);
+  margin-bottom: var(--space-6);
+}
+
+.alert-heading {
+  margin: 0 0 var(--space-2) 0;
+}
+
+
+.for-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: 0 1px 0 var(--shadow);
+  margin-bottom: var(--space-6);
+}
+
+.card {
+  padding: 0;
+  margin-bottom: var(--space-6);
+}
+
+.card-header {
+  color: var(--panel);
+  background-color: #000;
+  font-size: large;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.card-subtitle {
+  padding: var(--space-4) var(--space-5) 0 var(--space-5);
+  color: var(--muted);
+}
+
+.card-subtitle h5 {
+  margin: 0;
+  font-weight: 500;
+}
+
+.card-body {
+  padding: var(--space-4) var(--space-5) var(--space-5) var(--space-5);
+}
+
+.input-entrance {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.input-entrance input,
+.form-control,
+input {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  background: #fff;
+  color: var(--fg);
+}
+
+.input-entrance button,
+.btn,
+.admin-login,
+.back,
+button {
+  border: 1px solid var(--fg);
+  background: #111;
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+}
+
+.btn.btn-secondary {
+  background: #fff;
+  color: #111;
+}
+
+.btn.btn-primary {
+  background: #111;
+  color: #fff;
+}
+
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.admin-hero {
+  text-align: center;
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-hero h1 {
+  margin: 0 0 var(--space-2) 0;
+}
+
+.admin-hero p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.admin-content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) 0;
+}
+
+.admin-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.admin-login-page {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-7) 0;
+}
+
+.login-card {
+  width: min(520px, 92vw);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.login-card-header {
+  padding: var(--space-6) var(--space-6) var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+  text-align: center;
+}
+
+.login-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid #000;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.login-title {
+  margin: var(--space-3) 0 var(--space-2) 0;
+  font-size: 1.5rem;
+}
+
+.login-subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+.login-card-body {
+  padding: var(--space-5) var(--space-6) var(--space-6) var(--space-6);
+}
+
+.login-card-body .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.login-card-body .input-group .form-label {
+  margin-bottom: 0;
+}
+
+.login-card-body .form-control {
+  font-size: 1rem;
+  padding: var(--space-3) var(--space-4);
+}
+
+.login-card-body .btn {
+  font-size: 1rem;
+  padding: var(--space-3) var(--space-5);
+}
+
+.login-footnote {
+  margin: var(--space-4) 0 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.not-found {
+  text-align: center;
+  padding: var(--space-8) 0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-light {
+  color: var(--muted);
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.mb-3 {
+  margin-bottom: var(--space-3);
+}
+
+.mt-3 {
+  margin-top: var(--space-3);
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.form-label {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  color: var(--muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
