@@ -1,3 +1,5 @@
+const Quiz = require('../models/quiz')
+
 // Mock data strictly follows the database Schema and the required JSON format
 const initialQuizzes = [
     {
@@ -44,6 +46,25 @@ const initialQuizzes = [
     }
 ]
 
+const quizzesInDb = async () => {
+    const quizzes = await Quiz.find({})
+    return quizzes.map(quiz => quiz.toJSON())
+}
+
+// Generate an ID that is structurally valid for MongoDB, but does not belong to any quiz
+const nonExistingId = async () => {
+    const quiz = new Quiz({
+        name: 'willremovethissoon',
+        questions: { title: "Temporary" }
+    })
+    await quiz.save()
+    await quiz.deleteOne()
+
+    return quiz._id.toString()
+}
+
 module.exports = {
-    initialQuizzes
+    initialQuizzes,
+    quizzesInDb,
+    nonExistingId
 }

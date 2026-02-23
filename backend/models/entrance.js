@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const entranceSchema = new mongoose.Schema({
-    quizID: {
+    quizId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Quiz',
         required: true
