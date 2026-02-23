@@ -8,12 +8,13 @@ const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 
 const quizzesRouter = require('./controllers/quizzes')
+const authRouter = require('./controllers/auth')
 
 mongoose.set('strictQuery', false)
 
-logger.info(`connecting to ${config.MONGODB_URL}`)
+logger.info(`connecting to ${config.MONGODB_URI}`)
 
-mongoose.connect(config.MONGODB_URL)
+mongoose.connect(config.MONGODB_URI)
     .then(() => {
         logger.info('connected to MongoDB')
     })
@@ -26,6 +27,7 @@ app.use(express.json())
 app.use(middleware.tokenExtractor)
 
 app.use('/api/quizzes', quizzesRouter)
+app.use('/api/auth', authRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)

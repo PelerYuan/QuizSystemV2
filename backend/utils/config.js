@@ -1,16 +1,16 @@
 require('dotenv').config()
 
-const PORT = process.config.PORT | 3000
+const PORT = process.env.PORT | 3000
 const SECRET = process.env.SECRET
-const ADIN_PASSPORT = process.env.ADMIN_PASSWORD
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
-const MONGODB_URL = process.env.NODE_ENV === 'test'
-    ? process.env.MONGODB_URL_TEST
+const MONGODB_URI = process.env.NODE_ENV === 'test'
+    ? process.env.MONGODB_URI_TEST
     : process.env.MONGODB_URI_DEV
 
 module.exports = {
     PORT,
     SECRET,
-    ADIN_PASSPORT,
-    MONGODB_URL
+    ADMIN_PASSWORD,
+    MONGODB_URI
 }
