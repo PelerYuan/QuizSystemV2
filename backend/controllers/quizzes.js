@@ -4,10 +4,14 @@ const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
 
 quizzesRouter.get('/', async (request, response) => {
+    if (!request.token) {
+        return response.status(401).json({ error: 'token missing' })
+    }
+
     const decodedToken = jwt.verify(request.token, config.SECRET)
 
-    if (!decodedToken.id) {
-        return response.status(401).json({error: 'token invalid'})
+    if (!decodedToken.role || decodedToken.role !== 'admin') {
+        return response.status(401).json({ error: 'token invalid' })
     }
 
     const quizzes = await Quiz.find({})

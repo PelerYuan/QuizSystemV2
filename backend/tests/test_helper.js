@@ -1,6 +1,3 @@
-const jwt = require('jsonwebtoken')
-const config = require('../utils/config')
-
 // Mock data strictly follows the database Schema and the required JSON format
 const initialQuizzes = [
     {
@@ -47,17 +44,6 @@ const initialQuizzes = [
     }
 ]
 
-// Generates a valid JWT token for testing purposes
-const getValidToken = () => {
-    const userForToken = {
-        username: 'admin_test',
-        id: '65abc123def4567890abcdef' // Mocked ObjectId
-    }
-    // Note: Ensure process.env.SECRET is configured in your test environment (.env)
-    return jwt.sign(userForToken, config.SECRET)
-}
-
 module.exports = {
-    initialQuizzes,
-    getValidToken
+    initialQuizzes
 }
