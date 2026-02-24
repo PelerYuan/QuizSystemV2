@@ -29,7 +29,7 @@ const QuizEditor = () => {
         }
 
         fetchExistingQuiz()
-    }, [quizId, navigate, actions])
+    }, [quizId])
 
     const handleSubmit = async (e) => {
         e.preventDefault()

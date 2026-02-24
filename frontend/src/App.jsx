@@ -11,25 +11,26 @@ import AdminResult from "./pages/AdminResult";
 import Exam from "./pages/Exam";
 import Result from "./pages/Result";
 import NotFound from "./pages/NotFound";
-import {useEffect, useState} from "react";
+import quizService from "./services/quizzes.js";
+import {use, useEffect, useState} from "react";
 
 
 const App = () => {
-	const [user, setUser] = useState(null)
-
-    useEffect(() => {
-        const loggedUserJSON = window.localStorage.getItem('loggedQuizAdmin')
-        if (loggedUserJSON) {
-            const loggedUser = JSON.parse(loggedUserJSON)
-            setUser(loggedUser)
-            // quizService.setToken(loggedUser.token)
-        }
-    }, []);
+	const [user, setUser] = useState(() => {
+		const loggedUserJSON = window.localStorage.getItem('loggedQuizAdmin')
+		if (loggedUserJSON) {
+			const loggedUser = JSON.parse(loggedUserJSON)
+			quizService.setToken(loggedUser.token)
+			return loggedUser
+		}
+		return null
+	});
 
     const handleLogout = () => {
-        window.localStorage.removeItem('loggenQuizAdmin')
+        window.localStorage.removeItem('loggedQuizAdmin')
         setUser(null)
-        // quizService.setToken(null)
+		// Register HERE
+        quizService.setToken(null)
     }
 
     return (
