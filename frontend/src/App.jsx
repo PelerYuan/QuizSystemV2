@@ -23,11 +23,12 @@ const App = () => {
 						<Route path="/" element={<Home />} />
 						<Route path="/admin/login" element={<AdminLogin />} />
 						<Route path="/admin/dashboard" element={<AdminDashboard />} />
-						<Route path="/admin/edit/:quizId" element={<AdminEdit />} />
-						<Route path="/admin/trial/:quizId" element={<AdminTrial />} />
-						<Route path="/admin/result/:quizId" element={<AdminResult />} />
-						<Route path="/exam/:quizId" element={<Exam />} />
-						<Route path="/result/:quizId" element={<Result />} />
+						<Route path="/admin/editor/new" element={<AdminEdit />} />
+						<Route path="/admin/editor/quizId" element={<AdminEdit />} />
+						<Route path="/admin/trial/quizId" element={<AdminTrial />} />
+						<Route path="/admin/result/entranceId" element={<AdminResult />} />
+						<Route path="/exam/:accessCode" element={<Exam />} />
+						<Route path="/result/:submission" element={<Result />} />
 
 						<Route path="*" element={<NotFound />} />
 					</Routes>

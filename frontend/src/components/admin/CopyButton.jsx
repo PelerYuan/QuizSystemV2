@@ -28,3 +28,5 @@ function CopyButton(content = "COPY", text = "") {
     </button>
   );
 }
+
+export default CopyButton;

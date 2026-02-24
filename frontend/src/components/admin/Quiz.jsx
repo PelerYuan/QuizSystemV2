@@ -1,5 +1,5 @@
-import CopyButton from "../CopyButton";
-
+import CopyButton from "./CopyButton";
+import { useState } from "react";
 
 
 
@@ -37,12 +37,13 @@ const showEntrance = (quizId, ori_entrances) => {
 }
 
 
-function Quiz({ props }) {
+
+function Quiz({ quiz }) {
   
   return (
     <div className="quiz">
-      <h3>{props.name}</h3>
-      <p>{props.description}</p>
+      <h3>{quiz.name}</h3>
+      <p>{quiz.description}</p>
 
       <div className="operations">
         <button type="button" className="btn btn-primary">EDIT</button>
@@ -52,7 +53,7 @@ function Quiz({ props }) {
           type="button"
           className="btn btn-secondary"
           style={{ marginLeft: '12px' }}
-          onClick={() => showEntrance(props.id)}
+          onClick={() => showEntrance(quiz._id, quiz.entrances)}
         >
           Manage Entrance
         </button>

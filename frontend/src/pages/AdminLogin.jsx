@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const AdminLogin = () => {
   const [password, setPassword] = useState("")
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
+
 
 
   const handleSubmit = async (event) => {
@@ -39,7 +38,8 @@ const AdminLogin = () => {
         return
       }
 
-      navigate("/admin/dashboard")
+      localStorage.setItem("secretToken", data.token)
+      window.location.href = "/admin/dashboard"
 
     }
     catch (error) {

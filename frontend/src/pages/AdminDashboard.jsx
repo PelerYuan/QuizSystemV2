@@ -3,9 +3,6 @@
 import { useState, useEffect } from "react";
 import Quiz from "../components/admin/Quiz";
 
-
-
-
 // function generateRandomCode4() {
 //   const POOL = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 //   let code = "";
@@ -17,10 +14,9 @@ import Quiz from "../components/admin/Quiz";
 //   return code;
 // }
 
-
-
-
 const AdminDashboard = () => {
+
+  
   const [data, setData] = useState([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -59,8 +55,24 @@ const AdminDashboard = () => {
         setLoading(false);
       }
     };
-  })
+    fetchQuizzes();
+  }, [])
 
+  if (loading) {
+    return (
+      <main className="admin-page">
+        Loading...
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="admin-page">
+        <p className="error-message">{error}</p>
+      </main>
+    )
+  }
   
   return (
     <main className="admin-page">
@@ -90,7 +102,7 @@ const AdminDashboard = () => {
       </section>
 
       {data.map((quiz) => (
-        <Quiz />
+        <Quiz props={ quiz } />
       ))}
 
 
