@@ -69,6 +69,36 @@ export const useAdminEditForm = (initialData = null) => {
         setQuiz({...quiz, questions: updatedQuestions})
     }
 
+    const loadFetchedQuiz = (backendData) => {
+        const parsedQuestions = backendData.questions.questions.map(q => {
+            let uiType = 'SINGLE'
+
+            if (q.itext !== undefined) {
+                uiType = 'TEXT'
+            } else if (q.options) {
+                const correctCount = q.options.filter(opt => opt.correct).length
+                if (correctCount > 1) {
+                    uiType = 'MULTIPLE'
+                }
+            }
+
+            return {
+                Q: q.Q,
+                uiType: uiType,
+                options: q.options || [{ opt: '', correct: false }, { opt: '', correct: false }],
+                itext: q.itext !== undefined ? q.itext : ''
+            }
+        })
+
+        setQuiz({
+            title: backendData.questions.title || backendData.name,
+            subtitle: backendData.questions.subtitle || '',
+            description: backendData.description || '',
+            points: backendData.questions.points || 1,
+            questions: parsedQuestions
+        })
+    }
+
     const actions = {
         addQuestion,
         removeQuestion,
@@ -76,7 +106,8 @@ export const useAdminEditForm = (initialData = null) => {
         addOption,
         removeOption,
         handleOptionTextChange,
-        toggleCorrectAnswer
+        toggleCorrectAnswer,
+        loadFetchedQuiz
     }
 
     return {

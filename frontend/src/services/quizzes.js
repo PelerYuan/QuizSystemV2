@@ -1,0 +1,28 @@
+import axios from 'axios'
+
+const baseUrl = '/api/quizzes'
+
+let token = null
+const setToken = newToken => {
+    token = `Bearer ${newToken}`
+}
+
+const getOne = async (id) => {
+    const config = {headers: {Authorization: token}}
+    const response = await axios.get(`${baseUrl}/${id}`, config)
+    return response.data
+}
+
+const create = async (newObject) => {
+    const config = {headers: {Authorization: token}}
+    const response = await axios.post(baseUrl, newObject, config)
+    return response.data
+}
+
+const update = async (id, newObject) => {
+    const config = {headers: {Authorization: token}}
+    const response = await axios.put(`${baseUrl}/${id}`, newObject, config)
+    return response.data
+}
+
+export default {setToken, getOne, create, update}
