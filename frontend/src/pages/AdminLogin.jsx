@@ -1,7 +1,7 @@
-// components/AdminLogin.jsx
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import loginService from "../services/login";
+import quizService from "../services/quizzes.js";
 
 const AdminLogin = () => {
     const [password, setPassword] = useState("")
@@ -25,7 +25,7 @@ const AdminLogin = () => {
             const user = await loginService.login({password: pwd})
             window.localStorage.setItem('loggedQuizAdmin', JSON.stringify(user))
 
-            // quizService.setToken(user.token)
+            quizService.setToken(user.token)
 
             navigate("/admin/dashboard")
         } catch (error) {
