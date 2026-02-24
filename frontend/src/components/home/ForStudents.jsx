@@ -4,36 +4,25 @@ import { useNavigate } from "react-router-dom";
 
 function InputEntrance() {
   const [code, setCode] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const go = () => {
     const value = code.trim();
     if (!value) return;
 
-    const isValid = /^(?:\d{4}|[A-Z]{4}|(?=.*[A-Z])(?=.*\d)[A-Z\d]{4})$/.test(value);
-    if (!isValid) {
-      setError("Invalid input format. Please enter 4 digits, 4 uppercase letters or 4 mixed letters.");
-      return;
-    }
-
-    setError("");
     navigate(`/quiz/${encodeURIComponent(value)}`);
+    // 或 navigate(`/quiz?code=${encodeURIComponent(value)}`);
   };
 
   return (
     <div className="input-entrance" style={{ display: "flex", gap: 12 }}>
       <input
         value={code}
-        onChange={(e) => {
-          setCode(e.target.value);
-          if (error) setError("");
-        }}
+        onChange={(e) => setCode(e.target.value)}
         placeholder="Enter quiz code"
         onKeyDown={(e) => e.key === "Enter" && go()}
       />
       <button onClick={go}>Go</button>
-      {error && <div className="input-error">{error}</div>}
     </div>
   );
 }
