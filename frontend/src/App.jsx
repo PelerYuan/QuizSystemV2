@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import Header from "./components/partials/Header";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminEdit from "./pages/AdminEdit";
+import AdminEdit from "./pages/AdminEdit.jsx";
 import AdminTrial from "./pages/AdminTrial";
 import AdminResult from "./pages/AdminResult";
 import Exam from "./pages/Exam";
