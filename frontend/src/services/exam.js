@@ -12,4 +12,13 @@ const submitExam = async (payload) => {
     return response.data
 }
 
-export default { getEntrance, submitExam }
+const getResult = async (submissionId) => {
+    const response = await axios.get(`${baseUrl}/result/${submissionId}`)
+    return response.data
+}
+
+export default {
+    getEntrance,
+    submitExam,
+    getResult
+}
