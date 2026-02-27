@@ -26,7 +26,6 @@ const AdminLogin = ({ setUser, notify }) => {
             setUser(loggedUser)
 
             notify('Login successful! Welcome back.', 'success')
-
             navigate('/admin/dashboard')
 
         } catch (error) {
@@ -38,27 +37,31 @@ const AdminLogin = ({ setUser, notify }) => {
     }
 
     return (
-        <div style={{ maxWidth: '400px', margin: '60px auto', padding: '30px', border: '1px solid #e0e0e0', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ textAlign: 'center', color: '#333', marginBottom: '10px' }}>Admin Access</h2>
-            <p style={{ textAlign: 'center', color: '#666', marginBottom: '20px' }}>Please enter your password to continue</p>
+        <div className="max-w-md mx-auto mt-20 p-8 bg-white border border-slate-200 rounded-lg shadow-xl">
+            <h2 className="text-3xl font-bold text-center text-brand-900 mb-2">Admin Access</h2>
+            <p className="text-center text-slate-500 mb-8">Please enter your password to continue</p>
 
-            <form onSubmit={handleLogin}>
-                <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Password</label>
+            <form onSubmit={handleLogin} className="space-y-6">
+                <div>
+                    <label className="block mb-2 font-semibold text-slate-700">Password</label>
                     <input
                         type="password"
                         value={password}
                         name="Password"
                         placeholder="Enter admin password"
                         onChange={({ target }) => setPassword(target.value)}
-                        style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+                        className="w-full p-3 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow box-border"
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={isLoading}
-                    style={{ width: '100%', padding: '12px', backgroundColor: isLoading ? '#9bc2e6' : '#007bff', color: 'white', border: 'none', borderRadius: '4px', fontSize: '16px', cursor: isLoading ? 'not-allowed' : 'pointer' }}
+                    className={`w-full py-3 rounded font-bold text-white transition-all ${
+                        isLoading
+                            ? 'bg-brand-300 cursor-not-allowed'
+                            : 'bg-brand-500 hover:bg-brand-600 active:scale-95 shadow-md'
+                    }`}
                 >
                     {isLoading ? 'Logging in...' : 'Login'}
                 </button>

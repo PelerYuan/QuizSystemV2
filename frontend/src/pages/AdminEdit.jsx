@@ -1,10 +1,11 @@
+// src/pages/AdminEdit.jsx
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useAdminEditForm} from "../hooks/useAdminEditForm.js";
-import QuestionCard from "../components/admin/edit/questionCard.jsx";
+import { useAdminEditForm } from "../hooks/useAdminEditForm.js";
+import QuestionCard from "../components/admin/edit/questionCard.jsx"; // Note: You will likely need to refactor QuestionCard with Tailwind later
 import quizService from "../services/quizzes.js";
 
-const QuizEditor = () => {
+const QuizEditor = ({ notify }) => {
     const { quizId } = useParams()
     const navigate = useNavigate()
 
@@ -21,13 +22,13 @@ const QuizEditor = () => {
                 actions.loadFetchedQuiz(fetchedData)
             } catch (error) {
                 console.error('Failed to fetch quiz', error)
-                alert('Failed to load the quiz template. It might have been deleted.')
+                // Replaced native alert with elegant notify
+                notify('Failed to load the quiz template. It might have been deleted.', 'error')
                 navigate('/admin/dashboard')
             } finally {
                 setIsLoading(false)
             }
         }
-
         fetchExistingQuiz()
     }, [quizId])
 
@@ -55,82 +56,107 @@ const QuizEditor = () => {
         try {
             if (quizId === 'new') {
                 await quizService.create(payload)
-                alert('Quiz created successfully!')
+                notify('Quiz created successfully!', 'success')
             } else {
                 await quizService.update(quizId, payload)
-                alert('Quiz updated successfully!')
+                notify('Quiz updated successfully!', 'success')
             }
             navigate('/admin/dashboard')
         } catch (error) {
             console.error('Submit failed', error)
-            alert('Failed to save the quiz. Please check your connection and try again.')
+            notify('Failed to save the quiz. Please try again.', 'error')
         }
     }
 
     if (isLoading) {
-        return <div style={{ textAlign: 'center', marginTop: '50px', fontSize: '20px' }}>⏳ Loading Quiz Editor...</div>
+        return (
+            <div className="flex justify-center items-center mt-20 text-xl text-brand-600 font-semibold animate-pulse">
+                ⏳ Loading Quiz Editor...
+            </div>
+        )
     }
 
     return (
-        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '20px', fontFamily: 'sans-serif' }}>
+        <div className="max-w-4xl mx-auto p-6 font-sans">
 
             {/* Dynamic Title */}
-            <h2 style={{ marginBottom: '20px', color: '#333' }}>
+            <h2 className="text-3xl font-bold text-brand-900 mb-8 flex items-center gap-2">
                 {quizId === 'new' ? '📝 Create New Quiz Template' : '✏️ Edit Quiz Template'}
             </h2>
 
             {/* 1. Quiz Metadata Section */}
-            <div style={{ borderTop: '4px solid #007bff', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', padding: '20px', marginBottom: '30px', backgroundColor: 'white', borderRadius: '0 0 8px 8px' }}>
-                <h3 style={{ marginTop: 0, color: '#333' }}>Quiz Information</h3>
+            <div className="border-t-4 border-brand-500 shadow-lg p-8 mb-10 bg-white rounded-b-xl">
+                <h3 className="text-xl font-bold text-slate-800 mt-0 mb-6">Quiz Information</h3>
 
-                <div style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}>
-                    <div style={{ flex: 1 }}>
-                        <label><b>Title *</b></label>
-                        <input name="title" value={quiz.title} onChange={handleMetaChange} style={{ width: '100%', padding: '8px', marginTop: '5px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                <div className="flex flex-col md:flex-row gap-6 mb-6">
+                    <div className="flex-1">
+                        <label className="block font-semibold text-slate-700 mb-2">Title *</label>
+                        <input
+                            name="title"
+                            value={quiz.title}
+                            onChange={handleMetaChange}
+                            className="w-full p-3 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
+                        />
                     </div>
-                    <div style={{ flex: 1 }}>
-                        <label><b>Subtitle *</b></label>
-                        <input name="subtitle" value={quiz.subtitle} onChange={handleMetaChange} style={{ width: '100%', padding: '8px', marginTop: '5px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                    <div className="flex-1">
+                        <label className="block font-semibold text-slate-700 mb-2">Subtitle</label>
+                        <input
+                            name="subtitle"
+                            value={quiz.subtitle}
+                            onChange={handleMetaChange}
+                            className="w-full p-3 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
+                        />
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '20px' }}>
-                    <div style={{ flex: 2 }}>
-                        <label><b>Description *</b></label>
-                        <textarea name="description" value={quiz.description} onChange={handleMetaChange} style={{ width: '100%', padding: '8px', marginTop: '5px', height: '80px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex-2">
+                        <label className="block font-semibold text-slate-700 mb-2">Description</label>
+                        <textarea
+                            name="description"
+                            value={quiz.description}
+                            onChange={handleMetaChange}
+                            className="w-full p-3 h-24 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow resize-y"
+                        />
                     </div>
-                    <div style={{ flex: 1 }}>
-                        <label><b>Points per Question *</b></label>
-                        <input type="number" name="points" value={quiz.points} onChange={handleMetaChange} style={{ width: '100%', padding: '8px', marginTop: '5px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                    <div className="flex-1">
+                        <label className="block font-semibold text-slate-700 mb-2">Points per Question *</label>
+                        <input
+                            type="number"
+                            name="points"
+                            value={quiz.points}
+                            onChange={handleMetaChange}
+                            className="w-full p-3 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
+                        />
                     </div>
                 </div>
             </div>
 
             {/* 2. Questions Rendering Section */}
-            {quiz.questions.map((q, index) => (
-                <QuestionCard
-                    key={index}
-                    question={q}
-                    qIndex={index}
-                    actions={actions}
-                />
-            ))}
+            <div className="space-y-6">
+                {quiz.questions.map((q, index) => (
+                    <QuestionCard
+                        key={index}
+                        question={q}
+                        qIndex={index}
+                        actions={actions}
+                    />
+                ))}
+            </div>
 
             {/* 3. Add Question Button */}
             <button
                 onClick={actions.addQuestion}
-                style={{ width: '100%', padding: '15px', backgroundColor: '#f8f9fa', border: '2px dashed #007bff', color: '#007bff', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', marginBottom: '20px', transition: 'background-color 0.2s' }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#e9ecef'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#f8f9fa'}
+                className="w-full p-4 mt-6 bg-slate-50 border-2 border-dashed border-brand-400 text-brand-600 rounded-xl text-lg font-bold cursor-pointer mb-8 transition-colors hover:bg-brand-50 hover:border-brand-500"
             >
                 ＋ Add Question
             </button>
 
             {/* 4. Submit Button */}
-            <div style={{ textAlign: 'right' }}>
+            <div className="text-right border-t border-slate-200 pt-6">
                 <button
                     onClick={handleSubmit}
-                    style={{ padding: '12px 24px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', fontSize: '18px', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
+                    className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white border-none rounded-lg shadow-md font-bold text-lg cursor-pointer active:scale-95 transition-all"
                 >
                     {quizId === 'new' ? '💾 Save New Quiz' : '💾 Update Quiz'}
                 </button>

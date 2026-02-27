@@ -1,4 +1,6 @@
-import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
+import { useState } from "react";
+import quizService from "./services/quizzes.js";
 
 import Footer from "./components/partials/Footer";
 import Header from "./components/partials/Header";
@@ -12,9 +14,6 @@ import AdminResult from "./pages/AdminResult";
 import Exam from "./pages/Exam";
 import Result from "./pages/Result";
 import NotFound from "./pages/NotFound";
-import quizService from "./services/quizzes.js";
-import {use, useEffect, useState} from "react";
-
 
 const App = () => {
     const [user, setUser] = useState(() => {
@@ -27,46 +26,72 @@ const App = () => {
         return null
     });
 
-    const [notification, setNotification] = useState({message: null, type: 'success'})
+    const [notification, setNotification] = useState({ message: null, type: 'success' })
+
     const notify = (message, type = 'success') => {
-        setNotification({message, type})
+        setNotification({ message, type })
         setTimeout(() => {
-            setNotification({message: null, type: 'success'})
+            setNotification({ message: null, type: 'success' })
         }, 5000)
     }
 
     const handleLogout = () => {
         window.localStorage.removeItem('loggedQuizAdmin')
         setUser(null)
-        // Register HERE
         quizService.setToken(null)
-        notify('Logged out successfully')
+        notify('Logged out successfully', 'success')
     }
 
+    const requireAuth = (element) => {
+        return user ? element : <Navigate replace to="/admin/login" />;
+    };
+
     return (
-        <div className="app-container">
+        <div className="flex flex-col min-h-screen bg-brand-50">
             <Router>
-                <Header user={user} onLogout={handleLogout}/>
-                <Notification notification={notification}/>
-                <div className="App">
+                <Header user={user} onLogout={handleLogout} />
+                <Notification notification={notification} />
+
+                {/* flex-1 ensures the main content pushes the footer to the bottom */}
+                <main className="flex-1">
                     <Routes>
-                        <Route path="/" element={<Home/>}/>
+                        {/* Public Routes */}
+                        <Route path="/" element={<Home notify={notify}/>} />
+                        <Route path="/exam/:accessCode" element={<Exam notify={notify}/>} />
+                        <Route path="/result/:submissionId" element={<Result />} />
+
+                        {/* Login Route: Redirect to dashboard if already logged in */}
                         <Route
                             path="/admin/login"
-                            element={user ? <Navigate replace to="/admin/dashboard"/> :
-                                <AdminLogin setUser={setUser} notify={notify}/>}
+                            element={
+                                user
+                                    ? <Navigate replace to="/admin/dashboard" />
+                                    : <AdminLogin setUser={setUser} notify={notify} />
+                            }
                         />
-                        <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
-                        <Route path="/admin/edit/:quizId" element={<AdminEdit/>}/>
-                        <Route path="/admin/trial/:quizId" element={<AdminTrial/>}/>
-                        <Route path="/admin/result/:quizId" element={<AdminResult/>}/>
-                        <Route path="/exam/:quizId" element={<Exam/>}/>
-                        <Route path="/result/:quizId" element={<Result/>}/>
 
-                        <Route path="*" element={<NotFound/>}/>
+                        {/* Private Admin Routes: Wrapped with requireAuth */}
+                        <Route
+                            path="/admin/dashboard"
+                            element={requireAuth(<AdminDashboard notify={notify} />)}
+                        />
+                        <Route
+                            path="/admin/edit/:quizId"
+                            element={requireAuth(<AdminEdit notify={notify} />)}
+                        />
+                        <Route
+                            path="/admin/trial/:quizId"
+                            element={requireAuth(<AdminTrial notify={notify} />)}
+                        />
+                        <Route
+                            path="/admin/result/:quizId"
+                            element={requireAuth(<AdminResult notify={notify} />)}
+                        />
+
+                        <Route path="*" element={<NotFound />} />
                     </Routes>
-                </div>
-                <Footer/>
+                </main>
+                <Footer />
             </Router>
         </div>
     );
