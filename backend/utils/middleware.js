@@ -1,4 +1,7 @@
 const logger = require('./logger')
+const Quiz = require("../models/quiz");
+const jwt = require('jsonwebtoken')
+const config = require('./config')
 
 const tokenExtractor = (request, response, next) => {
     const authorization = request.get('authorization')
@@ -6,6 +9,19 @@ const tokenExtractor = (request, response, next) => {
         request.token = authorization.replace('Bearer ', '')
     } else {
         request.token = null
+    }
+    next()
+}
+
+const verifyAdmin = (request, response, next) => {
+    if (!request.token) {
+        response.status(401).json({error: 'token missing'})
+        return false
+    }
+    const decodedToken = jwt.verify(request.token, config.SECRET)
+    if (!decodedToken.role || decodedToken.role !== 'admin') {
+        response.status(401).json({error: 'token invalid'})
+        return false
     }
     next()
 }
@@ -34,6 +50,7 @@ const errorHandler = (error, request, response, next) => {
 
 module.exports = {
     tokenExtractor,
+    verifyAdmin,
     unknownEndpoint,
     errorHandler
 }
