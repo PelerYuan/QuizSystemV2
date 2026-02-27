@@ -1,75 +1,70 @@
-import {useState} from "react";
-import {useNavigate} from "react-router-dom";
-import loginService from "../services/login";
-import quizService from "../services/quizzes.js";
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import loginService from '../services/login'
+import quizService from '../services/quizzes'
 
-const AdminLogin = () => {
-    const [password, setPassword] = useState("")
-    const [error, setError] = useState(null)
-    const [loading, setLoading] = useState(false)
+const AdminLogin = ({ setUser, notify }) => {
+    const [password, setPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate()
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        setError(null)
+    const handleLogin = async (event) => {
+        event.preventDefault()
 
-        const pwd = password.trim()
-        if (!pwd) {
-            setError("Password cannot be empty")
+        if (!password.trim()) {
+            notify('Password cannot be empty', 'error')
             return
         }
 
-        setLoading(true)
+        setIsLoading(true)
 
         try {
-            const user = await loginService.login({password: pwd})
-            window.localStorage.setItem('loggedQuizAdmin', JSON.stringify(user))
+            const loggedUser = await loginService.login({ password }) // POST /api/auth/login
 
-            quizService.setToken(user.token)
+            window.localStorage.setItem('loggedQuizAdmin', JSON.stringify(loggedUser))
+            quizService.setToken(loggedUser.token)
+            setUser(loggedUser)
 
-            navigate("/admin/dashboard")
+            notify('Login successful! Welcome back.', 'success')
+
+            navigate('/admin/dashboard')
+
         } catch (error) {
-            const errorMessage = error.response?.data?.error || "An error occurred during login"
-            setError(errorMessage)
+            const msg = error.response?.data?.error || 'Invalid password or network error'
+            notify(msg, 'error')
         } finally {
-            setLoading(false)
+            setIsLoading(false)
         }
     }
 
     return (
-        <section className="admin-login-page">
-            <div className="login-card">
-                <div className="login-card-header">
-                    <span className="login-badge">Admin Access</span>
-                    <h3 className="login-title">Admin Login</h3>
-                    <p className="login-subtitle">Welcome to QuizSystem Admin Panel</p>
-                </div>
+        <div style={{ maxWidth: '400px', margin: '60px auto', padding: '30px', border: '1px solid #e0e0e0', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+            <h2 style={{ textAlign: 'center', color: '#333', marginBottom: '10px' }}>Admin Access</h2>
+            <p style={{ textAlign: 'center', color: '#666', marginBottom: '20px' }}>Please enter your password to continue</p>
 
-                <form onSubmit={handleSubmit}>
-                    <label htmlFor="nameInput" className="form-label">
-                        Password
-                    </label>
+            <form onSubmit={handleLogin}>
+                <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Password</label>
                     <input
                         type="password"
                         value={password}
-                        placeholder="Please enter the admin password"
-                        onChange={(e) => setPassword(e.target.value)}
+                        name="Password"
+                        placeholder="Enter admin password"
+                        onChange={({ target }) => setPassword(target.value)}
+                        style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' }}
                     />
+                </div>
 
-                    {error && <div style={{color: "crimson", marginTop: 8}}>{error}</div>}
-
-                    <button
-                        type="submit"
-                        className="btn btn-primary w-100 mt-3"
-                        disabled={loading}
-                    >
-                        {loading ? "Logging in..." : "Login"}
-                    </button>
-                </form>
-                <p className="login-footnote">Authorized staff only</p>
-            </div>
-        </section>
-    );
+                <button
+                    type="submit"
+                    disabled={isLoading}
+                    style={{ width: '100%', padding: '12px', backgroundColor: isLoading ? '#9bc2e6' : '#007bff', color: 'white', border: 'none', borderRadius: '4px', fontSize: '16px', cursor: isLoading ? 'not-allowed' : 'pointer' }}
+                >
+                    {isLoading ? 'Logging in...' : 'Login'}
+                </button>
+            </form>
+        </div>
+    )
 }
 
 export default AdminLogin
