@@ -33,7 +33,17 @@ const App = () => {
     const notify = (message, type = 'success') => {
         if (type === 'error') {
             toast.error(message)
-        } else {
+        } else if (type === 'warning') {
+            toast(message, {
+                icon: '⚠️',
+                style: {
+                    color: '#92400e',
+                    backgroundColor: '#fef3c7',
+                    border: '2px solid #f59e0b'
+                }
+            });
+        } else
+         {
             toast.success(message)
         }
     }
