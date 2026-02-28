@@ -2,24 +2,30 @@ const OptionRow = ({ option, qIndex, optIndex, uiType, actions }) => {
     const { handleOptionTextChange, toggleCorrectAnswer, removeOption } = actions
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-            <input
-                type={uiType === 'SINGLE' ? 'radio' : 'checkbox'}
-                checked={option.correct}
-                onChange={() => toggleCorrectAnswer(qIndex, optIndex)}
-                style={{ marginRight: '10px', cursor: 'pointer' }}
-            />
+        <div className="flex items-center gap-3 mb-3 group">
+            <div className="flex items-center justify-center w-8">
+                <input
+                    type={uiType === 'SINGLE' ? 'radio' : 'checkbox'}
+                    name={uiType === 'SINGLE' ? `question-${qIndex}` : undefined}
+                    checked={option.correct || false}
+                    onChange={() => toggleCorrectAnswer(qIndex, optIndex)}
+                    className="w-5 h-5 text-brand-600 focus:ring-brand-500 cursor-pointer"
+                    title="Mark as correct answer"
+                />
+            </div>
 
             <input
-                style={{ flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-                value={option.opt}
+                className="flex-1 p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow bg-slate-50 hover:bg-white focus:bg-white"
+                value={option.opt || ''}
                 onChange={(e) => handleOptionTextChange(qIndex, optIndex, e.target.value)}
-                placeholder="Enter option text"
+                placeholder={`Option ${String.fromCharCode(65 + optIndex)} (e.g. A. Something)`}
             />
 
             <button
+                type="button"
                 onClick={() => removeOption(qIndex, optIndex)}
-                style={{ marginLeft: '10px', backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                className="p-3 text-rose-400 hover:text-white hover:bg-rose-500 border border-transparent hover:border-rose-600 rounded-lg transition-colors cursor-pointer"
+                title="Remove Option"
             >
                 ✖
             </button>

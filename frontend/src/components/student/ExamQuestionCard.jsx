@@ -19,12 +19,23 @@ const ExamQuestionCard = ({ q, index, currentAnswer, onAnswerChange, pointsPerQu
             </div>
 
             <div className="p-6">
+                {/* 【新增】：图片渲染区域 */}
+                {q.image && (
+                    <div className="mb-6 flex justify-center bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <img
+                            src={`/api/uploads/${q.image}`}
+                            alt="Question Illustration"
+                            className="max-h-80 w-auto object-contain rounded shadow-sm"
+                        />
+                    </div>
+                )}
+
                 {isText ? (
                     <textarea
                         value={currentAnswer || ''}
                         onChange={(e) => onAnswerChange(index, e.target.value)}
                         placeholder="Type your answer here..."
-                        className="w-full p-4 h-32 rounded border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none resize-y"
+                        className="w-full p-4 h-32 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none resize-y"
                     />
                 ) : (
                     <div className="space-y-3">
@@ -35,7 +46,7 @@ const ExamQuestionCard = ({ q, index, currentAnswer, onAnswerChange, pointsPerQu
 
                             return (
                                 <label key={optIdx} className={`flex items-center p-4 rounded-lg border cursor-pointer transition-colors ${
-                                    isChecked ? 'border-brand-500 bg-brand-50' : 'border-slate-200 hover:bg-slate-50'
+                                    isChecked ? 'border-brand-500 bg-brand-50 shadow-sm' : 'border-slate-200 hover:bg-slate-50'
                                 }`}>
                                     <input
                                         type={isMultiChoice ? 'checkbox' : 'radio'}
@@ -44,7 +55,7 @@ const ExamQuestionCard = ({ q, index, currentAnswer, onAnswerChange, pointsPerQu
                                         onChange={() => onAnswerChange(index, optItem.opt, isMultiChoice)}
                                         className="w-5 h-5 text-brand-600 focus:ring-brand-500"
                                     />
-                                    <span className="ml-3 text-slate-700">{optItem.opt}</span>
+                                    <span className="ml-3 text-slate-700 font-medium">{optItem.opt}</span>
                                 </label>
                             )
                         })}

@@ -3,6 +3,7 @@ import { useState } from "react";
 import toast, {Toaster} from "react-hot-toast";
 import quizService from "./services/quizzes.js";
 import entrancesService from "./services/entrances.js";
+import mediaService from "./services/media.js";
 
 import Footer from "./components/partials/Footer";
 import Header from "./components/partials/Header";
@@ -23,6 +24,7 @@ const App = () => {
             const loggedUser = JSON.parse(loggedUserJSON)
             quizService.setToken(loggedUser.token)
             entrancesService.setToken(loggedUser.token)
+            mediaService.setToken(loggedUser.token)
             return loggedUser
         }
         return null
@@ -53,6 +55,7 @@ const App = () => {
         setUser(null)
         quizService.setToken(null)
         entrancesService.setToken(null)
+        mediaService.setToken(null)
         notify('Logged out successfully', 'success')
     }
 

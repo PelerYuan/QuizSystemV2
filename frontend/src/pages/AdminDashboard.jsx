@@ -6,7 +6,7 @@ import CreateEntranceDialog from '../components/dialogs/CreateEntranceDialog'
 import ConfirmDialog from '../components/dialogs/ConfirmDialog'
 import QuizItem from '../components/admin/dashboard/QuizItem'
 
-import { useModal } from '../hooks/useModal'
+import {useModal} from '../hooks/useModal'
 
 const AdminDashboard = ({notify}) => {
     const navigate = useNavigate()
@@ -15,9 +15,9 @@ const AdminDashboard = ({notify}) => {
     const [expandedQuizzes, setExpandedQuizzes] = useState({})
     const fileInputRef = useRef()
 
-    const createEntranceModal = useModal({ quizId: null, quizName: '' })
-    const deleteQuizModal = useModal({ targetId: null, targetName: '' })
-    const deleteEntranceModal = useModal({ targetId: null, targetCode: '' })
+    const createEntranceModal = useModal({quizId: null, quizName: ''})
+    const deleteQuizModal = useModal({targetId: null, targetName: ''})
+    const deleteEntranceModal = useModal({targetId: null, targetCode: ''})
 
     useEffect(() => {
         fetchDashboardData()
@@ -34,10 +34,10 @@ const AdminDashboard = ({notify}) => {
         }
     }
 
-    const handleCreateQuiz = () => navigate('/admin/editor/new')
+    const handleCreateQuiz = () => navigate('/admin/edit/new')
 
     const executeDeleteQuiz = async () => {
-        const { targetId: id, targetName: name } = deleteQuizModal.data
+        const {targetId: id, targetName: name} = deleteQuizModal.data
         try {
             await quizService.remove(id)
             setQuizzes(quizzes.filter(q => (q.id || q._id) !== id))
@@ -56,11 +56,20 @@ const AdminDashboard = ({notify}) => {
     const handleImportJSON = async (event) => {
         const file = event.target.files[0]
         if (!file) return
+
         const reader = new FileReader()
         reader.onload = async (e) => {
             try {
                 const parsedJSON = JSON.parse(e.target.result)
-                const newQuiz = await quizService.create(parsedJSON)
+                if (!parsedJSON.title || !parsedJSON.questions) {
+                    throw new Error("Invalid format: missing 'title' or 'questions'")
+                }
+                const payload = {
+                    name: parsedJSON.title,
+                    description: parsedJSON.description || '',
+                    questions: parsedJSON
+                }
+                const newQuiz = await quizService.create(payload)
                 setQuizzes(quizzes.concat(newQuiz))
                 notify('Quiz imported successfully!', 'success')
             } catch (error) {
@@ -87,7 +96,7 @@ const AdminDashboard = ({notify}) => {
     }
 
     const executeDeleteEntrance = async () => {
-        const { targetId: id, targetCode: code } = deleteEntranceModal.data
+        const {targetId: id, targetCode: code} = deleteEntranceModal.data
         try {
             await entranceService.remove(id)
             setEntrances(entrances.filter(e => (e.id || e._id) !== id))
@@ -125,7 +134,7 @@ const AdminDashboard = ({notify}) => {
     const toggleExpand = (quizId) => setExpandedQuizzes(prev => ({...prev, [quizId]: !prev[quizId]}))
 
     const entranceActions = {
-        onDelete: (id, code) => deleteEntranceModal.open({ targetId: id, targetCode: code }),
+        onDelete: (id, code) => deleteEntranceModal.open({targetId: id, targetCode: code}),
         onToggleActive: handleToggleActive,
         onCopyLink: copyLinkToClipboard,
         onCopyCode: copyCodeToClipboard
@@ -195,8 +204,8 @@ const AdminDashboard = ({notify}) => {
                             entrances={quizEntrances}
                             isExpanded={expandedQuizzes[currentQuizId]}
                             onToggleExpand={toggleExpand}
-                            onDeleteQuiz={(id, name) => deleteQuizModal.open({ targetId: id, targetName: name })}
-                            onOpenCreateEntrance={(id, name) => createEntranceModal.open({ quizId: id, quizName: name })}
+                            onDeleteQuiz={(id, name) => deleteQuizModal.open({targetId: id, targetName: name})}
+                            onOpenCreateEntrance={(id, name) => createEntranceModal.open({quizId: id, quizName: name})}
                             entranceActions={entranceActions}
                         />
                     )

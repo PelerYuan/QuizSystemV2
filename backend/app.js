@@ -31,7 +31,7 @@ app.use(cors())
 app.use(express.json())
 app.use(middleware.tokenExtractor)
 
-app.use('/uploads', express.static('uploads'))
+app.use('/api/uploads', express.static('uploads'))
 
 app.use(
     '/reference',

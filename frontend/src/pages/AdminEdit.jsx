@@ -1,16 +1,17 @@
-// src/pages/AdminEdit.jsx
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAdminEditForm } from "../hooks/useAdminEditForm.js";
-import QuestionCard from "../components/admin/edit/questionCard.jsx"; // Note: You will likely need to refactor QuestionCard with Tailwind later
+import QuestionCard from "../components/admin/edit/QuestionCard.jsx";
 import quizService from "../services/quizzes.js";
 
-const QuizEditor = ({ notify }) => {
+const AdminEdit = ({ notify }) => {
     const { quizId } = useParams()
     const navigate = useNavigate()
 
     const { quiz, handleMetaChange, actions } = useAdminEditForm()
     const [isLoading, setIsLoading] = useState(false)
+
+    const titleRef = useRef(null)
 
     useEffect(() => {
         const fetchExistingQuiz = async () => {
@@ -22,7 +23,6 @@ const QuizEditor = ({ notify }) => {
                 actions.loadFetchedQuiz(fetchedData)
             } catch (error) {
                 console.error('Failed to fetch quiz', error)
-                // Replaced native alert with elegant notify
                 notify('Failed to load the quiz template. It might have been deleted.', 'error')
                 navigate('/admin/dashboard')
             } finally {
@@ -32,8 +32,68 @@ const QuizEditor = ({ notify }) => {
         fetchExistingQuiz()
     }, [quizId])
 
+    const validateForm = () => {
+        // 1. 校验标题
+        if (!quiz.title || !quiz.title.trim()) {
+            notify('Quiz title is required.', 'error')
+            titleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            titleRef.current?.focus()
+            return false
+        }
+
+        // 2. 校验必须有题目
+        if (!quiz.questions || quiz.questions.length === 0) {
+            notify('Please add at least one question to the quiz.', 'error')
+            return false
+        }
+
+        // 3. 深度校验每一道题
+        for (let i = 0; i < quiz.questions.length; i++) {
+            const q = quiz.questions[i]
+            const qElement = document.getElementById(`question-${i}`) // 获取 QuestionCard 绑定的 id
+
+            // 校验题干
+            if (!q.Q || !q.Q.trim()) {
+                notify(`Question ${i + 1} text cannot be empty.`, 'error')
+                qElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                return false
+            }
+
+            // 校验选择题
+            if (q.uiType !== 'TEXT') {
+                // 必须至少有2个选项
+                if (!q.options || q.options.length < 2) {
+                    notify(`Question ${i + 1} must have at least 2 options.`, 'error')
+                    qElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    return false
+                }
+
+                // 选项内容不能有空
+                const hasEmptyOption = q.options.some(opt => !opt.opt || !opt.opt.trim())
+                if (hasEmptyOption) {
+                    notify(`Question ${i + 1} has an empty option.`, 'error')
+                    qElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    return false
+                }
+
+                // 必须至少有一个正确答案
+                const hasCorrectAnswer = q.options.some(opt => opt.correct === true || opt.correct === 'true')
+                if (!hasCorrectAnswer) {
+                    notify(`Question ${i + 1} must have at least one correct answer selected.`, 'error')
+                    qElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
+
+        // 运行校验，如果不通过则中断提交流程
+        if (!validateForm()) return
+
         const payload = {
             name: quiz.title,
             description: quiz.description,
@@ -42,11 +102,17 @@ const QuizEditor = ({ notify }) => {
                 subtitle: quiz.subtitle,
                 points: Number(quiz.points),
                 questions: quiz.questions.map(q => {
+                    // 构建符合后端规范的数据结构
                     const formattedQ = { Q: q.Q }
+                    if (q.image) formattedQ.image = q.image
+
                     if (q.uiType === 'TEXT') {
                         formattedQ.itext = ''
                     } else {
-                        formattedQ.options = q.options
+                        formattedQ.options = q.options.map(opt => ({
+                            ...opt,
+                            correct: opt.correct === true || opt.correct === 'true'
+                        }))
                     }
                     return formattedQ
                 })
@@ -70,32 +136,43 @@ const QuizEditor = ({ notify }) => {
 
     if (isLoading) {
         return (
-            <div className="flex justify-center items-center mt-20 text-xl text-brand-600 font-semibold animate-pulse">
+            <div className="min-h-[60vh] flex justify-center items-center text-xl text-brand-600 font-semibold animate-pulse">
                 ⏳ Loading Quiz Editor...
             </div>
         )
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-6 font-sans">
+        <div className="max-w-4xl mx-auto p-6 font-sans pb-24 mt-4">
 
             {/* Dynamic Title */}
-            <h2 className="text-3xl font-bold text-brand-900 mb-8 flex items-center gap-2">
-                {quizId === 'new' ? '📝 Create New Quiz Template' : '✏️ Edit Quiz Template'}
-            </h2>
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-extrabold text-brand-900 tracking-tight">
+                    {quizId === 'new' ? '📝 Create New Quiz' : '✏️ Edit Quiz Template'}
+                </h2>
+                <button
+                    onClick={() => navigate('/admin/dashboard')}
+                    className="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
 
             {/* 1. Quiz Metadata Section */}
-            <div className="border-t-4 border-brand-500 shadow-lg p-8 mb-10 bg-white rounded-b-xl">
-                <h3 className="text-xl font-bold text-slate-800 mt-0 mb-6">Quiz Information</h3>
+            <div className="bg-white shadow-sm border border-slate-200 rounded-xl p-8 mb-10 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-brand-500"></div>
+                <h3 className="text-xl font-bold text-slate-800 mt-0 mb-6">General Information</h3>
 
                 <div className="flex flex-col md:flex-row gap-6 mb-6">
                     <div className="flex-1">
-                        <label className="block font-semibold text-slate-700 mb-2">Title *</label>
+                        <label className="block font-semibold text-slate-700 mb-2">Quiz Title <span className="text-red-500">*</span></label>
                         <input
+                            ref={titleRef}
                             name="title"
                             value={quiz.title}
                             onChange={handleMetaChange}
-                            className="w-full p-3 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
+                            placeholder="e.g. Python Fundamentals"
+                            className="w-full p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow bg-slate-50 hover:bg-white focus:bg-white"
                         />
                     </div>
                     <div className="flex-1">
@@ -104,29 +181,33 @@ const QuizEditor = ({ notify }) => {
                             name="subtitle"
                             value={quiz.subtitle}
                             onChange={handleMetaChange}
-                            className="w-full p-3 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
+                            placeholder="e.g. Term 1 Assessment"
+                            className="w-full p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow bg-slate-50 hover:bg-white focus:bg-white"
                         />
                     </div>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-6">
-                    <div className="flex-2">
-                        <label className="block font-semibold text-slate-700 mb-2">Description</label>
+                    <div className="grow-2">
+                        <label className="block font-semibold text-slate-700 mb-2">Internal Description</label>
                         <textarea
                             name="description"
                             value={quiz.description}
                             onChange={handleMetaChange}
-                            className="w-full p-3 h-24 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow resize-y"
+                            placeholder="Optional notes for other teachers..."
+                            className="w-full p-3 h-12 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow resize-y bg-slate-50 hover:bg-white focus:bg-white"
                         />
                     </div>
                     <div className="flex-1">
-                        <label className="block font-semibold text-slate-700 mb-2">Points per Question *</label>
+                        <label className="block font-semibold text-slate-700 mb-2">Points per Question <span className="text-red-500">*</span></label>
                         <input
                             type="number"
                             name="points"
+                            min="0"
+                            step="0.5"
                             value={quiz.points}
                             onChange={handleMetaChange}
-                            className="w-full p-3 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
+                            className="w-full p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow bg-slate-50 hover:bg-white focus:bg-white"
                         />
                     </div>
                 </div>
@@ -147,23 +228,25 @@ const QuizEditor = ({ notify }) => {
             {/* 3. Add Question Button */}
             <button
                 onClick={actions.addQuestion}
-                className="w-full p-4 mt-6 bg-slate-50 border-2 border-dashed border-brand-400 text-brand-600 rounded-xl text-lg font-bold cursor-pointer mb-8 transition-colors hover:bg-brand-50 hover:border-brand-500"
+                className="w-full p-6 mt-6 bg-slate-50 border-2 border-dashed border-slate-300 text-slate-600 rounded-xl text-lg font-bold transition-all hover:bg-brand-50 hover:border-brand-400 hover:text-brand-600 hover:shadow-inner active:scale-[0.99] flex justify-center items-center gap-2"
             >
-                ＋ Add Question
+                <span className="text-2xl leading-none">+</span> Add New Question
             </button>
 
-            {/* 4. Submit Button */}
-            <div className="text-right border-t border-slate-200 pt-6">
-                <button
-                    onClick={handleSubmit}
-                    className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white border-none rounded-lg shadow-md font-bold text-lg cursor-pointer active:scale-95 transition-all"
-                >
-                    {quizId === 'new' ? '💾 Save New Quiz' : '💾 Update Quiz'}
-                </button>
+            {/* 4. Sticky Footer Submit Action */}
+            <div className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50">
+                <div className="max-w-4xl mx-auto flex justify-end">
+                    <button
+                        onClick={handleSubmit}
+                        className="px-10 py-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-full shadow-md hover:shadow-lg font-extrabold text-lg transition-all active:scale-95 flex items-center gap-2"
+                    >
+                        <span>💾</span> {quizId === 'new' ? 'Save & Create Quiz' : 'Save Changes'}
+                    </button>
+                </div>
             </div>
 
         </div>
     )
 }
 
-export default QuizEditor
+export default AdminEdit

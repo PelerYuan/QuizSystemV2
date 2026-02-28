@@ -24,6 +24,17 @@ const TrialQuestionCard = ({ q, index, pointsPerQuestion }) => {
             </div>
 
             <div className="p-6">
+                {/* 【新增】：图片渲染区域 */}
+                {q.image && (
+                    <div className="mb-6 flex justify-center bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <img
+                            src={`/api/uploads/${q.image}`}
+                            alt="Question Illustration"
+                            className="max-h-80 w-auto object-contain rounded shadow-sm"
+                        />
+                    </div>
+                )}
+
                 {isText ? (
                     <div className="w-full p-4 min-h-[8rem] rounded border bg-slate-50 text-slate-400 italic border-slate-200 flex items-center justify-center">
                         [ Text Input Area For Students ]

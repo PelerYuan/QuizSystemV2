@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import loginService from '../services/login'
 import quizService from '../services/quizzes'
 import entrancesService from "../services/entrances.js";
+import mediaService from "../services/media.js";
 
 const AdminLogin = ({ setUser, notify }) => {
     const [password, setPassword] = useState('')
@@ -25,6 +26,7 @@ const AdminLogin = ({ setUser, notify }) => {
             window.localStorage.setItem('loggedQuizAdmin', JSON.stringify(loggedUser))
             quizService.setToken(loggedUser.token)
             entrancesService.setToken(loggedUser.token)
+            mediaService.setToken(loggedUser.token)
             setUser(loggedUser)
 
             notify('Login successful! Welcome back.', 'success')

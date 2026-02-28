@@ -6,12 +6,10 @@ const ResultQuestionCard = ({q, index, studentAnsObj, pointsPerQuestion}) => {
     const isMissed = isText ? (!studentAnsObj.answer) : (!studentAnsObj.selections?.length)
 
     return (
-        <div
-            className={`bg-white rounded-xl shadow-md overflow-hidden border-2 ${isMissed ? 'border-red-400' : 'border-slate-200'}`}>
+        <div className={`bg-white rounded-xl shadow-md overflow-hidden border-2 ${isMissed ? 'border-red-400' : 'border-slate-200'}`}>
             <div className={`px-6 py-4 border-b flex flex-col ${isMissed ? 'bg-red-50' : 'bg-slate-50'}`}>
                 <div className="flex gap-4">
-                    <span
-                        className={`font-bold px-3 py-1 rounded-full text-sm shrink-0 h-fit ${isMissed ? 'bg-red-100 text-red-700' : 'bg-brand-100 text-brand-700'}`}>
+                    <span className={`font-bold px-3 py-1 rounded-full text-sm shrink-0 h-fit ${isMissed ? 'bg-red-100 text-red-700' : 'bg-brand-100 text-brand-700'}`}>
                         Q {index + 1}
                     </span>
                     <div className="w-full">
@@ -35,6 +33,17 @@ const ResultQuestionCard = ({q, index, studentAnsObj, pointsPerQuestion}) => {
             </div>
 
             <div className="p-6">
+                {/* 【新增】：图片渲染区域 */}
+                {q.image && (
+                    <div className="mb-6 flex justify-center bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <img
+                            src={`/api/uploads/${q.image}`}
+                            alt="Question Illustration"
+                            className="max-h-80 w-auto object-contain rounded shadow-sm"
+                        />
+                    </div>
+                )}
+
                 {isText ? (
                     <div className="w-full p-4 min-h-[8rem] rounded border bg-slate-50 text-slate-700 border-slate-200">
                         {studentAnsObj.answer || <span className="text-red-400 italic">No answer provided.</span>}

@@ -41,7 +41,7 @@ const QuizItem = ({
                         Delete
                     </button>
                     <button
-                        onClick={() => navigate(`/admin/editor/${currentQuizId}`)}
+                        onClick={() => navigate(`/admin/edit/${currentQuizId}`)}
                         className="flex-1 lg:flex-none px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold rounded transition-colors whitespace-nowrap"
                     >
                         Edit
