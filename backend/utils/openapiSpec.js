@@ -1,446 +1,405 @@
-const spec = {
-    openapi: '3.1.0',
+const openapiSpec = {
+    openapi: '3.0.0',
     info: {
-        title: 'Quiz System API Reference',
+        title: 'Quiz Management API',
+        description: 'Backend API for the React Quiz Management System, supporting teacher administration and student exam execution.',
         version: '1.0.0',
-        description: 'Modern API documentation powered by Scalar.',
     },
+    servers: [
+        {
+            url: '/api',
+            description: 'Local development server proxy',
+        },
+    ],
     components: {
         securitySchemes: {
             bearerAuth: {
                 type: 'http',
                 scheme: 'bearer',
                 bearerFormat: 'JWT',
+                description: 'Enter your JWT token obtained from /auth/login',
             },
         },
         schemas: {
             Quiz: {
                 type: 'object',
-                // ADDED: 'id' is always present in DB responses
-                required: ['id', 'name', 'questions'],
                 properties: {
-                    id: { type: 'string', example: '65abc123def4567890abcdef' },
-                    name: { type: 'string', example: 'Midterm Python Fundamentals' },
-                    description: { type: 'string', example: 'Covers basic Python concepts for Term 2' },
-                    questions: {
-                        type: 'object',
-                        description: 'Flexible JSON object matching the Quiz Data Format specification',
-                        example: {
-                            title: 'PYTHON QUIZ TRIAL',
-                            points: 1,
-                            questions: [
-                                { Q: 'What is the value?', options: [{ opt: 'a', correct: true }] }
-                            ]
-                        }
-                    },
+                    _id: { type: 'string' },
+                    name: { type: 'string' },
+                    description: { type: 'string' },
+                    questions: { type: 'object', description: 'Mixed JSON format defining the quiz content' },
                     createdAt: { type: 'string', format: 'date-time' },
                     updatedAt: { type: 'string', format: 'date-time' }
                 }
             },
             Entrance: {
                 type: 'object',
-                // ADDED: Strict required array based on schema.md
-                required: ['id', 'quizId', 'accessCode', 'name', 'isActive'],
                 properties: {
-                    id: { type: 'string', example: '65xyz987def4567890uvwxyz' },
-                    quizId: {
-                        type: 'object',
-                        description: 'Populated Quiz object containing at least the ID and name',
-                        example: { id: '65abc123def4567890abcdef', name: 'Midterm Python Fundamentals' }
-                    },
-                    accessCode: { type: 'string', example: 'ABCD', description: 'Auto-generated 4-character uppercase code' },
-                    name: { type: 'string', example: 'Monday Morning Session' },
-                    description: { type: 'string', example: 'For Class A students' },
-                    isActive: { type: 'boolean', example: true },
+                    _id: { type: 'string' },
+                    quizId: { type: 'string' },
+                    accessCode: { type: 'string', description: '4-character uppercase alphanumeric code' },
+                    name: { type: 'string' },
+                    description: { type: 'string' },
+                    isActive: { type: 'boolean' },
                     createdAt: { type: 'string', format: 'date-time' },
                     updatedAt: { type: 'string', format: 'date-time' }
                 }
             },
-            SubmissionResult: {
+            Submission: {
                 type: 'object',
-                // ADDED: Strict required array ensuring frontend receives all necessary result data
-                required: ['submissionId', 'studentName', 'totalScore', 'entranceName', 'quizTitle', 'quizQuestions', 'studentAnswers'],
                 properties: {
-                    submissionId: { type: 'string', example: '65sub123def4567890abcdef' },
-                    studentName: { type: 'string', example: 'John Doe' },
-                    totalScore: { type: 'number', example: 10 },
-                    submittedAt: { type: 'string', format: 'date-time' },
-                    entranceName: { type: 'string', example: 'Monday Morning Session' },
-                    quizTitle: { type: 'string', example: 'Midterm Python Fundamentals' },
-                    quizQuestions: { type: 'object', description: 'The original quiz questions, including correct answers.' },
-                    studentAnswers: { type: 'object', description: 'The graded answers matching the Answer Data Format.' }
+                    _id: { type: 'string' },
+                    entranceId: { type: 'string' },
+                    studentName: { type: 'string' },
+                    answers: { type: 'object' },
+                    totalScore: { type: 'number' },
+                    submittedAt: { type: 'string', format: 'date-time' }
                 }
             }
         }
     },
     paths: {
-        '/api/auth/login': {
+        // --- 1. Authentication ---
+        '/auth/login': {
             post: {
+                tags: ['Authentication'],
                 summary: 'Admin Login',
-                tags: ['Authentication'],
                 requestBody: {
                     required: true,
                     content: {
                         'application/json': {
                             schema: {
                                 type: 'object',
-                                required: ['password'], // Ensured password is required in body
-                                properties: { password: { type: 'string', example: '123456' } },
-                            },
-                        },
-                    },
-                },
-                responses: {
-                    200: { description: 'Successful login returns JWT token' },
-                    401: { description: 'Invalid password' },
-                },
-            },
-        },
-        '/api/auth/me': {
-            get: {
-                summary: 'Get Current Role',
-                tags: ['Authentication'],
-                security: [{ bearerAuth: [] }],
-                responses: {
-                    200: { description: 'Returns the role of the authenticated user' },
-                    401: { description: 'Token missing or invalid' },
-                },
-            },
-        },
-        '/api/auth/logout': {
-            post: {
-                summary: 'Admin Logout',
-                tags: ['Authentication'],
-                security: [{ bearerAuth: [] }],
-                responses: {
-                    200: { description: 'Logged out successfully' },
-                    401: { description: 'Token missing or invalid' },
-                },
-            },
-        },
-        '/api/quizzes': {
-            get: {
-                summary: 'Get All Quizzes',
-                tags: ['Quiz Management'],
-                security: [{ bearerAuth: [] }],
-                responses: {
-                    200: {
-                        description: 'Returns an array of all quiz templates',
-                        content: {
-                            'application/json': {
-                                schema: { type: 'array', items: { $ref: '#/components/schemas/Quiz' } }
-                            }
-                        }
-                    },
-                    401: { description: 'Token missing or invalid' },
-                },
-            },
-            post: {
-                summary: 'Create a New Quiz',
-                tags: ['Quiz Management'],
-                security: [{ bearerAuth: [] }],
-                requestBody: {
-                    required: true,
-                    content: {
-                        'application/json': {
-                            schema: {
-                                type: 'object',
-                                required: ['name', 'questions'],
-                                properties: {
-                                    name: { type: 'string', example: 'New Quiz Name' },
-                                    description: { type: 'string', example: 'Optional description' },
-                                    questions: { type: 'object', description: 'JSON object containing quiz structure' }
-                                }
-                            }
-                        }
-                    }
-                },
-                responses: {
-                    201: {
-                        description: 'Quiz successfully created',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/Quiz' } } }
-                    },
-                    400: { description: 'Validation error (missing required fields)' },
-                    401: { description: 'Token missing or invalid' }
-                }
-            }
-        },
-        '/api/quizzes/{id}': {
-            parameters: [
-                {
-                    name: 'id',
-                    in: 'path',
-                    required: true,
-                    description: 'The MongoDB ObjectId of the Quiz',
-                    schema: { type: 'string' }
-                }
-            ],
-            get: {
-                summary: 'Get a Specific Quiz',
-                tags: ['Quiz Management'],
-                security: [{ bearerAuth: [] }],
-                responses: {
-                    200: {
-                        description: 'Returns the requested quiz template',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/Quiz' } } }
-                    },
-                    401: { description: 'Token missing or invalid' },
-                    404: { description: 'Quiz not found' }
-                }
-            },
-            put: {
-                summary: 'Update an Existing Quiz',
-                tags: ['Quiz Management'],
-                security: [{ bearerAuth: [] }],
-                requestBody: {
-                    required: true,
-                    content: {
-                        'application/json': {
-                            schema: {
-                                type: 'object',
-                                required: ['name', 'questions'],
-                                properties: {
-                                    name: { type: 'string', example: 'Updated Quiz Name' },
-                                    description: { type: 'string', example: 'Updated description' },
-                                    questions: { type: 'object' }
-                                }
+                                properties: { password: { type: 'string' } }
                             }
                         }
                     }
                 },
                 responses: {
                     200: {
-                        description: 'Quiz successfully updated',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/Quiz' } } }
-                    },
-                    400: { description: 'Validation error (name and questions strictly required)' },
-                    401: { description: 'Token missing or invalid' },
-                    404: { description: 'Quiz not found' }
-                }
-            },
-            delete: {
-                summary: 'Delete a Quiz',
-                description: 'Deletes a quiz template and cascades deletion to all associated Entrances and Submissions.',
-                tags: ['Quiz Management'],
-                security: [{ bearerAuth: [] }],
-                responses: {
-                    204: { description: 'Quiz successfully deleted (No Content)' },
-                    401: { description: 'Token missing or invalid' },
-                    404: { description: 'Quiz not found' }
-                }
-            }
-        },
-        '/api/entrances': {
-            get: {
-                summary: 'Get All Entrances',
-                description: 'Returns all exam sessions. The parent quizId is populated with the quiz name.',
-                tags: ['Entrance Management'],
-                security: [{ bearerAuth: [] }],
-                responses: {
-                    200: {
-                        description: 'Returns an array of entrances',
-                        content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Entrance' } } } }
-                    },
-                    401: { description: 'Token missing or invalid' }
-                }
-            },
-            post: {
-                summary: 'Create a New Exam Session',
-                description: 'Generates a new Entrance with an auto-generated 4-character accessCode.',
-                tags: ['Entrance Management'],
-                security: [{ bearerAuth: [] }],
-                requestBody: {
-                    required: true,
-                    content: {
-                        'application/json': {
-                            schema: {
-                                type: 'object',
-                                required: ['quizId', 'name', 'isActive'],
-                                properties: {
-                                    quizId: { type: 'string', example: '65abc123def4567890abcdef' },
-                                    name: { type: 'string', example: 'New Exam Session' },
-                                    description: { type: 'string', example: 'Optional description' },
-                                    isActive: { type: 'boolean', example: true }
-                                }
-                            }
-                        }
-                    }
-                },
-                responses: {
-                    201: {
-                        description: 'Entrance successfully created',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/Entrance' } } }
-                    },
-                    400: { description: 'Validation error (missing strictly required fields)' },
-                    401: { description: 'Token missing or invalid' },
-                    404: { description: 'Referenced quiz not found' }
-                }
-            }
-        },
-        '/api/entrances/{id}': {
-            parameters: [
-                {
-                    name: 'id',
-                    in: 'path',
-                    required: true,
-                    description: 'The MongoDB ObjectId of the Entrance',
-                    schema: { type: 'string' }
-                }
-            ],
-            put: {
-                summary: 'Update / Toggle Entrance',
-                description: 'Allows partial updates to the Entrance, primarily used to toggle the `isActive` status.',
-                tags: ['Entrance Management'],
-                security: [{ bearerAuth: [] }],
-                requestBody: {
-                    required: true,
-                    content: {
-                        'application/json': {
-                            schema: {
-                                type: 'object',
-                                // Note: Intentionally left 'required' out here since PUT /entrances allows partial toggles
-                                properties: {
-                                    name: { type: 'string', example: 'Updated Exam Name' },
-                                    description: { type: 'string', example: 'Updated description' },
-                                    isActive: { type: 'boolean', example: false }
-                                }
-                            }
-                        }
-                    }
-                },
-                responses: {
-                    200: {
-                        description: 'Entrance successfully updated',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/Entrance' } } }
-                    },
-                    401: { description: 'Token missing or invalid' },
-                    404: { description: 'Entrance not found' }
-                }
-            },
-            delete: {
-                summary: 'Delete an Entrance',
-                description: 'Deletes an entrance and cascades deletion to all associated student Submissions.',
-                tags: ['Entrance Management'],
-                security: [{ bearerAuth: [] }],
-                responses: {
-                    204: { description: 'Entrance successfully deleted (No Content)' },
-                    401: { description: 'Token missing or invalid' },
-                    404: { description: 'Entrance not found' }
-                }
-            }
-        },
-        '/api/exam/entrance/{accessCode}': {
-            parameters: [
-                {
-                    name: 'accessCode',
-                    in: 'path',
-                    required: true,
-                    description: 'The 4-character auto-generated exam code',
-                    schema: { type: 'string', example: 'ABCD' }
-                }
-            ],
-            get: {
-                summary: 'Access Exam Session',
-                description: 'Validates the access code and returns the exam questions. **Anti-cheating feature:** Standard correct answers are stripped from the payload.',
-                tags: ['Student Exam Execution'],
-                security: [],
-                responses: {
-                    200: {
-                        description: 'Returns the safe version of the quiz along with entrance metadata',
+                        description: 'Successful login',
                         content: {
                             'application/json': {
                                 schema: {
                                     type: 'object',
-                                    required: ['entranceId', 'entranceName', 'quiz'],
-                                    properties: {
-                                        entranceId: { type: 'string' },
-                                        entranceName: { type: 'string' },
-                                        quiz: { type: 'object' }
-                                    }
+                                    properties: { token: { type: 'string' }, role: { type: 'string' } }
                                 }
                             }
                         }
                     },
-                    403: { description: 'Exam session is currently closed' },
-                    404: { description: 'Invalid access code or associated quiz not found' }
+                    401: { description: 'Invalid password' }
                 }
             }
         },
-        '/api/exam/submit': {
+        '/auth/me': {
+            get: {
+                tags: ['Authentication'],
+                summary: 'Verify Token',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: { description: 'Token is valid' },
+                    401: { description: 'Token missing or invalid' }
+                }
+            }
+        },
+        '/auth/logout': {
             post: {
-                summary: 'Submit Exam Answers',
-                description: 'Accepts student answers and performs auto-grading. Calculates the final score server-side to prevent tampering.',
-                tags: ['Student Exam Execution'],
-                security: [],
+                tags: ['Authentication'],
+                summary: 'Admin Logout',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: { description: 'Logged out successfully' }
+                }
+            }
+        },
+
+        // --- 2. Quiz Management ---
+        '/quizzes': {
+            get: {
+                tags: ['Quizzes'],
+                summary: 'Get all quizzes',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: 'List of quizzes',
+                        content: { 'application/json': { schema: { type: 'array', items: { $ref: '#/components/schemas/Quiz' } } } }
+                    }
+                }
+            },
+            post: {
+                tags: ['Quizzes'],
+                summary: 'Create a new quiz template',
+                security: [{ bearerAuth: [] }],
                 requestBody: {
                     required: true,
                     content: {
                         'application/json': {
                             schema: {
                                 type: 'object',
-                                required: ['entranceId', 'studentName', 'answers'],
                                 properties: {
-                                    entranceId: { type: 'string', example: '65xyz987def4567890uvwxyz' },
-                                    studentName: { type: 'string', example: 'John Doe' },
-                                    answers: {
-                                        type: 'object',
-                                        description: 'Object matching the Answer Data Format specification',
-                                        example: {
-                                            questions: [
-                                                { selections: ["A"] },
-                                                { answer: "Text response" }
-                                            ]
+                                    name: { type: 'string' },
+                                    description: { type: 'string' },
+                                    questions: { type: 'object' }
+                                },
+                                required: ['name', 'questions']
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: { description: 'Quiz created successfully' }
+                }
+            }
+        },
+        '/quizzes/{id}': {
+            get: {
+                tags: ['Quizzes'],
+                summary: 'Get a specific quiz',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Quiz details', content: { 'application/json': { schema: { $ref: '#/components/schemas/Quiz' } } } },
+                    404: { description: 'Quiz not found' }
+                }
+            },
+            put: {
+                tags: ['Quizzes'],
+                summary: 'Update a specific quiz',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: { name: { type: 'string' }, description: { type: 'string' }, questions: { type: 'object' } }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: { description: 'Quiz updated successfully' },
+                    400: { description: 'Missing required fields' }
+                }
+            },
+            delete: {
+                tags: ['Quizzes'],
+                summary: 'Delete a quiz (Cascade deletes Entrances & Submissions)',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    204: { description: 'Deleted successfully' },
+                    404: { description: 'Quiz not found' }
+                }
+            }
+        },
+
+        // --- 3. Entrance Management ---
+        '/entrances': {
+            get: {
+                tags: ['Entrances'],
+                summary: 'Get all entrances',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: { description: 'List of entrances' }
+                }
+            },
+            post: {
+                tags: ['Entrances'],
+                summary: 'Create a new exam session (Entrance)',
+                security: [{ bearerAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    quizId: { type: 'string' },
+                                    name: { type: 'string' },
+                                    description: { type: 'string' },
+                                    isActive: { type: 'boolean' }
+                                },
+                                required: ['quizId', 'name', 'isActive']
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: { description: 'Entrance created successfully' },
+                    400: { description: 'Missing required fields' },
+                    404: { description: 'Referenced quiz not found' }
+                }
+            }
+        },
+        '/entrances/{id}': {
+            put: {
+                tags: ['Entrances'],
+                summary: 'Update an entrance (e.g. toggle isActive)',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: { name: { type: 'string' }, description: { type: 'string' }, isActive: { type: 'boolean' } }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: { description: 'Entrance updated successfully' },
+                    404: { description: 'Entrance not found' }
+                }
+            },
+            delete: {
+                tags: ['Entrances'],
+                summary: 'Delete an entrance (Cascade deletes Submissions)',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    204: { description: 'Deleted successfully' },
+                    404: { description: 'Entrance not found' }
+                }
+            }
+        },
+
+        // --- 4. Analytics ---
+        '/analytics/entrance/{entranceId}': {
+            get: {
+                tags: ['Analytics'],
+                summary: 'Get flattened analytics dashboard data',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'entranceId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: {
+                        description: 'Analytics payload including stats and flattened score list',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        entranceName: { type: 'string' },
+                                        maxScore: { type: 'number' },
+                                        totalStudents: { type: 'number' },
+                                        averageScore: { type: 'number' },
+                                        highestScore: { type: 'number' },
+                                        lowestScore: { type: 'number' },
+                                        scoreList: {
+                                            type: 'array',
+                                            items: {
+                                                type: 'object',
+                                                properties: {
+                                                    submissionId: { type: 'string' },
+                                                    studentName: { type: 'string' },
+                                                    totalScore: { type: 'number' },
+                                                    submittedAt: { type: 'string', format: 'date-time' }
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                },
-                responses: {
-                    201: {
-                        description: 'Successfully graded and saved the submission',
-                        content: {
-                            'application/json': {
-                                schema: {
-                                    type: 'object',
-                                    required: ['submissionId'],
-                                    properties: { submissionId: { type: 'string', example: '65sub123def4567890abcdef' } }
-                                }
-                            }
-                        }
-                    },
-                    400: { description: 'Missing required payload fields' },
-                    403: { description: 'Exam is closed, submissions are no longer accepted' },
-                    404: { description: 'Entrance not found' }
                 }
             }
         },
-        '/api/exam/result/{submissionId}': {
-            parameters: [
-                {
-                    name: 'submissionId',
-                    in: 'path',
-                    required: true,
-                    description: 'The MongoDB ObjectId of the completed Submission',
-                    schema: { type: 'string' }
-                }
-            ],
+        '/analytics/export/{entranceId}': {
             get: {
-                summary: 'Get Student Results',
-                description: 'Retrieves a specific student\'s final score, their answers, and the original quiz questions with the correct options included.',
-                tags: ['Student Exam Execution'],
-                security: [],
+                tags: ['Analytics'],
+                summary: 'Export results as CSV',
+                security: [{ bearerAuth: [] }],
+                parameters: [{ name: 'entranceId', in: 'path', required: true, schema: { type: 'string' } }],
                 responses: {
-                    200: {
-                        description: 'Returns the detailed test results and parsed quiz structure',
-                        content: { 'application/json': { schema: { $ref: '#/components/schemas/SubmissionResult' } } }
-                    },
+                    200: { description: 'CSV file download', content: { 'text/csv': {} } }
+                }
+            }
+        },
+
+        // --- 5. Student Exam Execution ---
+        '/exam/entrance/{accessCode}': {
+            get: {
+                tags: ['Student Exam'],
+                summary: 'Fetch an active quiz for a student',
+                parameters: [{ name: 'accessCode', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Quiz payload (safe version without correct answers)' },
+                    403: { description: 'Exam session closed' },
+                    404: { description: 'Invalid access code' }
+                }
+            }
+        },
+        '/exam/submit': {
+            post: {
+                tags: ['Student Exam'],
+                summary: 'Submit answers for grading',
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    entranceId: { type: 'string' },
+                                    studentName: { type: 'string' },
+                                    answers: { type: 'object', description: 'Answers formatted per answer_format.md' }
+                                },
+                                required: ['entranceId', 'studentName', 'answers']
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: {
+                        description: 'Exam graded and submitted successfully',
+                        content: { 'application/json': { schema: { type: 'object', properties: { submissionId: { type: 'string' } } } } }
+                    }
+                }
+            }
+        },
+        '/exam/result/{submissionId}': {
+            get: {
+                tags: ['Student Exam'],
+                summary: 'Get results for a specific submission',
+                parameters: [{ name: 'submissionId', in: 'path', required: true, schema: { type: 'string' } }],
+                responses: {
+                    200: { description: 'Detailed student result and feedback' },
                     404: { description: 'Submission not found' }
                 }
             }
+        },
+
+        // --- 6. Media ---
+        '/media/upload': {
+            post: {
+                tags: ['Media'],
+                summary: 'Upload an image file',
+                security: [{ bearerAuth: [] }],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'multipart/form-data': {
+                            schema: {
+                                type: 'object',
+                                properties: { image: { type: 'string', format: 'binary' } }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    201: {
+                        description: 'Image uploaded successfully',
+                        content: { 'application/json': { schema: { type: 'object', properties: { filename: { type: 'string' }, url: { type: 'string' } } } } }
+                    },
+                    400: { description: 'Upload failed or file type not allowed' }
+                }
+            }
         }
-    },
+    }
 }
 
-module.exports = spec
+module.exports = openapiSpec;
