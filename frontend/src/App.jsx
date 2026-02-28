@@ -1,10 +1,11 @@
 import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 import { useState } from "react";
+import toast, {Toaster} from "react-hot-toast";
 import quizService from "./services/quizzes.js";
+import entrancesService from "./services/entrances.js";
 
 import Footer from "./components/partials/Footer";
 import Header from "./components/partials/Header";
-import Notification from "./components/Notification.jsx";
 import Home from "./pages/Home";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -21,6 +22,7 @@ const App = () => {
         if (loggedUserJSON) {
             const loggedUser = JSON.parse(loggedUserJSON)
             quizService.setToken(loggedUser.token)
+            entrancesService.setToken(loggedUser.token)
             return loggedUser
         }
         return null
@@ -29,16 +31,18 @@ const App = () => {
     const [notification, setNotification] = useState({ message: null, type: 'success' })
 
     const notify = (message, type = 'success') => {
-        setNotification({ message, type })
-        setTimeout(() => {
-            setNotification({ message: null, type: 'success' })
-        }, 5000)
+        if (type === 'error') {
+            toast.error(message)
+        } else {
+            toast.success(message)
+        }
     }
 
     const handleLogout = () => {
         window.localStorage.removeItem('loggedQuizAdmin')
         setUser(null)
         quizService.setToken(null)
+        entrancesService.setToken(null)
         notify('Logged out successfully', 'success')
     }
 
@@ -50,7 +54,7 @@ const App = () => {
         <div className="flex flex-col min-h-screen bg-brand-50">
             <Router>
                 <Header user={user} onLogout={handleLogout} />
-                <Notification notification={notification} />
+                <Toaster position={"top-center"}/>
 
                 {/* flex-1 ensures the main content pushes the footer to the bottom */}
                 <main className="flex-1">
