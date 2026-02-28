@@ -8,6 +8,8 @@ import QuizItem from '../components/admin/dashboard/QuizItem'
 
 import {useModal} from '../hooks/useModal'
 
+import {Plus, Import} from "lucide-react";
+
 const AdminDashboard = ({notify}) => {
     const navigate = useNavigate()
     const [quizzes, setQuizzes] = useState([])
@@ -175,12 +177,12 @@ const AdminDashboard = ({notify}) => {
                     <input type="file" accept=".json" ref={fileInputRef} onChange={handleImportJSON}
                            className="hidden"/>
                     <button onClick={() => fileInputRef.current.click()}
-                            className="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg shadow">📁
-                        Import
+                            className="flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg shadow transition-colors">
+                        <Import className="w-5 h-5" /> Import
                     </button>
                     <button onClick={handleCreateQuiz}
-                            className="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-lg shadow-md">➕
-                        Create Quiz
+                            className="flex items-center gap-2 px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-lg shadow-md transition-colors">
+                        <Plus className="w-5 h-5" /> Create Quiz
                     </button>
                 </div>
             </div>

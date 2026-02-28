@@ -28,13 +28,12 @@ const EntranceItem = ({ entrance, onDelete, onToggleActive, onCopyCode, onCopyLi
                 <button
                     onClick={() => onCopyCode(entrance)}
                     title={entrance.isActive ? "Click to copy Code" : "Inactive - Cannot copy"}
-                    className={`border px-6 py-1.5 rounded-md font-mono font-bold text-lg tracking-[0.2em] shadow-inner transition-colors flex items-center gap-2
+                    className={`border px-6 py-1.5 rounded-md font-mono font-bold text-lg text-center
                         ${entrance.isActive
                         ? 'bg-brand-50 border-brand-200 text-brand-700 hover:bg-brand-100 hover:border-brand-300 active:scale-95'
                         : 'bg-slate-200 border-slate-300 text-slate-500 cursor-not-allowed'}`}
                 >
                     {entrance.accessCode}
-                    <span className={`${entrance.isActive ? 'text-brand-400' : 'text-slate-400'} text-xs tracking-normal font-sans`}>📋</span>
                 </button>
             </div>
 
