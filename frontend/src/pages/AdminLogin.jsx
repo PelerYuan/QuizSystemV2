@@ -4,6 +4,8 @@ import loginService from '../services/login'
 import quizService from '../services/quizzes'
 import entrancesService from "../services/entrances.js";
 import mediaService from "../services/media.js";
+import analyticService from "../services/analytics.js";
+import analytics from "../services/analytics.js";
 
 const AdminLogin = ({ setUser, notify }) => {
     const [password, setPassword] = useState('')
@@ -27,6 +29,7 @@ const AdminLogin = ({ setUser, notify }) => {
             quizService.setToken(loggedUser.token)
             entrancesService.setToken(loggedUser.token)
             mediaService.setToken(loggedUser.token)
+            analyticService.setToken(loggedUser.token)
             setUser(loggedUser)
 
             notify('Login successful! Welcome back.', 'success')

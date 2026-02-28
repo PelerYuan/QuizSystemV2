@@ -4,6 +4,7 @@ import toast, {Toaster} from "react-hot-toast";
 import quizService from "./services/quizzes.js";
 import entrancesService from "./services/entrances.js";
 import mediaService from "./services/media.js";
+import analyticsService from "./services/analytics.js";
 
 import Footer from "./components/partials/Footer";
 import Header from "./components/partials/Header";
@@ -25,6 +26,7 @@ const App = () => {
             quizService.setToken(loggedUser.token)
             entrancesService.setToken(loggedUser.token)
             mediaService.setToken(loggedUser.token)
+            analyticsService.setToken(loggedUser.token)
             return loggedUser
         }
         return null
@@ -56,6 +58,7 @@ const App = () => {
         quizService.setToken(null)
         entrancesService.setToken(null)
         mediaService.setToken(null)
+        analyticsService.setToken(null)
         notify('Logged out successfully', 'success')
     }
 
@@ -101,7 +104,7 @@ const App = () => {
                             element={requireAuth(<AdminTrial notify={notify} />)}
                         />
                         <Route
-                            path="/admin/result/:quizId"
+                            path="/admin/result/:entranceId"
                             element={requireAuth(<AdminResult notify={notify} />)}
                         />
 
