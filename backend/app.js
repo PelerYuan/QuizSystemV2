@@ -14,6 +14,7 @@ const quizzesRouter = require('./controllers/quizzes')
 const authRouter = require('./controllers/auth')
 const entranceRouter = require('./controllers/entrances')
 const examRouter = require('./controllers/exam')
+const analyticsRouter = require('./controllers/analytics')
 
 mongoose.set('strictQuery', false)
 
@@ -49,6 +50,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/entrances', entranceRouter)
 app.use('/api/exam', examRouter)
 app.use('/api/media', mediaRouter)
+app.use('/api/analytics', analyticsRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
