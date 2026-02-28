@@ -1,7 +1,10 @@
 import {useState, useEffect} from 'react'
 import {useParams, useNavigate} from 'react-router-dom'
 import examService from '../services/exam'
-import ExamQuestionCard from "../components/student/ExamQuestionCard.jsx";
+import ExamQuestionCard from "../components/student/ExamQuestionCard.jsx"
+import ConfirmDialog from '../components/dialogs/ConfirmDialog'
+
+import {useModal} from '../hooks/useModal'
 
 const Exam = ({notify}) => {
     const {accessCode} = useParams()
@@ -13,6 +16,8 @@ const Exam = ({notify}) => {
 
     const [studentName, setStudentName] = useState('')
     const [answers, setAnswers] = useState({})
+
+    const confirmSubmitModal = useModal()
 
     useEffect(() => {
         const fetchExam = async () => {
@@ -54,19 +59,25 @@ const Exam = ({notify}) => {
         })
     }
 
-    const handleSubmit = async (e) => {
+    const handleInitialSubmit = (e) => {
         e.preventDefault()
         if (!studentName.trim()) {
             notify('Please enter your name.', 'error')
             window.scrollTo({top: 0, behavior: 'smooth'})
             return
         }
+
         if (answeredCount < totalQuestions) {
-            const confirmSubmit = window.confirm(`You missed ${totalQuestions - answeredCount} questions. Submit anyway?`)
-            if (!confirmSubmit) return
+            confirmSubmitModal.open()
+            return
         }
 
+        executeSubmit()
+    }
+
+    const executeSubmit = async () => {
         setIsSubmitting(true)
+
         try {
             const formattedQuestions = questions.map((q, index) => {
                 const studentAns = answers[index]
@@ -99,7 +110,18 @@ const Exam = ({notify}) => {
 
     return (
         <div className="bg-slate-50 min-h-screen pb-20 font-sans">
-            <div className="sticky top-0 z-50 bg-white shadow-sm border-b border-slate-200">
+
+            <ConfirmDialog
+                isOpen={confirmSubmitModal.isOpen}
+                onClose={confirmSubmitModal.close}
+                onConfirm={executeSubmit}
+                title="Incomplete Assessment"
+                message={`You missed ${totalQuestions - answeredCount} questions. Are you sure you want to submit anyway?`}
+                confirmText="Submit Anyway"
+                isDanger={true}
+            />
+
+            <div className="sticky top-0 z-40 bg-white shadow-sm border-b border-slate-200">
                 <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
                     <div>
                         <h1 className="text-xl font-bold text-brand-900 truncate">{examData.quiz.questions.title}</h1>
@@ -117,6 +139,23 @@ const Exam = ({notify}) => {
             </div>
 
             <div className="max-w-3xl mx-auto px-4 mt-8 space-y-8">
+
+                <div className="bg-white rounded-xl shadow-md border border-brand-200 p-8 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-brand-500"></div>
+                    <h2 className="text-xl font-bold text-slate-800 mb-2">Student Information</h2>
+                    <p className="text-sm text-slate-500 mb-6">Please enter your full name before starting the
+                        assessment.</p>
+                    <input
+                        type="text"
+                        value={studentName}
+                        onChange={(e) => setStudentName(e.target.value)}
+                        placeholder="e.g. John Doe"
+                        className="w-full md:w-1/2 p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none bg-slate-50 hover:bg-white transition-colors"
+                        required
+                        autoFocus
+                    />
+                </div>
+
                 {questions.map((q, index) => (
                     <ExamQuestionCard
                         key={index}
@@ -130,7 +169,7 @@ const Exam = ({notify}) => {
 
                 <div className="pt-4 pb-12 text-center">
                     <button
-                        onClick={handleSubmit}
+                        onClick={handleInitialSubmit}
                         disabled={isSubmitting}
                         className={`w-full md:w-auto md:px-16 py-4 rounded-full font-bold text-lg text-white transition-all shadow-md ${
                             isSubmitting ? 'bg-slate-400' : 'bg-brand-500 hover:bg-brand-600 active:scale-95'

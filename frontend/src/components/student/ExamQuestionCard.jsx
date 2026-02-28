@@ -1,6 +1,6 @@
 const ExamQuestionCard = ({ q, index, currentAnswer, onAnswerChange, pointsPerQuestion }) => {
     const isText = q.itext !== undefined
-    const isMultiChoice = q.isMultipleChoice === true
+    const isMultiChoice = q.isMultiChoice === true
 
     return (
         <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow">
