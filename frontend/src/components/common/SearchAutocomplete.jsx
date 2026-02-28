@@ -3,6 +3,7 @@ import { useState, useEffect, Fragment } from 'react'
 // 引入 Headless UI 的 Combobox 及其相关组件
 import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption, Transition } from '@headlessui/react'
 import { useDebounce } from '../../hooks/useDebounce'
+import { Search } from 'lucide-react'
 
 const SearchAutocomplete = ({
                                 placeholder = "Search...",
@@ -78,7 +79,7 @@ const SearchAutocomplete = ({
             {/* Headless UI Combobox  */}
             <Combobox value={null} onChange={handleSelect}>
                 <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-slate-400 z-10 pointer-events-none">🔍</span>
+                    <span className="absolute left-3 top-2.5 text-slate-400 z-10 pointer-events-none"><Search className="w-5 h-5" /></span>
 
                     <ComboboxInput
                         className="w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm transition-all bg-white"

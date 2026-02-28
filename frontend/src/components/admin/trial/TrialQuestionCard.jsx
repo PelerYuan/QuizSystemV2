@@ -1,3 +1,5 @@
+import { Check } from 'lucide-react'
+
 const TrialQuestionCard = ({ q, index, pointsPerQuestion }) => {
     const isText = q.itext !== undefined
     const correctCount = q.options?.filter(opt => opt.correct === true || opt.correct === 'true').length || 0
@@ -60,7 +62,7 @@ const TrialQuestionCard = ({ q, index, pointsPerQuestion }) => {
                                     <span className="ml-3 font-medium">{optItem.opt}</span>
 
                                     {isCorrect && (
-                                        <span className="ml-auto text-green-600 text-sm font-bold">✓ Correct Answer</span>
+                                        <span className="ml-auto text-green-600 text-sm font-bold flex items-center"><Check className="w-4 h-4 mr-1 inline-block" /> Correct Answer</span>
                                     )}
                                 </div>
                             )

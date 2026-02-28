@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import EntranceItem from './EntranceItem'
+import { ChevronRight } from 'lucide-react'
 
 const QuizItem = ({
                       quiz,
@@ -22,7 +23,7 @@ const QuizItem = ({
             >
                 <div className="flex items-start gap-3 w-full lg:w-auto lg:flex-1 min-w-0">
                     <span className={`mt-1 text-slate-400 transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
-                        ▶
+                        <ChevronRight className="w-5 h-5" />
                     </span>
                     <div className="min-w-0">
                         <h2 className="text-xl font-bold text-slate-800 truncate">{quiz.name}</h2>

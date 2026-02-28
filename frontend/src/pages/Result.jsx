@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react'
 import {useParams, useNavigate, Link} from 'react-router-dom'
 import examService from '../services/exam'
 import ResultQuestionCard from "../components/student/ResultQuestionCard.jsx";
+import { BarChart2, PartyPopper } from 'lucide-react'
 
 const Result = ({notify}) => {
     const {submissionId} = useParams()
@@ -30,7 +31,7 @@ const Result = ({notify}) => {
         fetchResult()
     }, [submissionId, navigate, notify])
 
-    if (isLoading) return <div className="min-h-screen flex justify-center items-center font-semibold animate-pulse text-brand-600">📊 Loading Results...</div>
+    if (isLoading) return <div className="min-h-screen flex justify-center items-center font-semibold animate-pulse text-brand-600"><BarChart2 className="w-5 h-5 inline-block mr-2" /> Loading Results...</div>
     if (!resultData) return null
 
     const questions = resultData.quizQuestions?.questions || []
@@ -57,7 +58,7 @@ const Result = ({notify}) => {
 
             <div className="max-w-3xl mx-auto px-4 mt-8 space-y-8">
                 <div className="bg-white rounded-xl shadow-md border border-slate-200 p-8 text-center">
-                    <h2 className="text-2xl font-bold text-slate-800 mb-2">Quiz Completed! 🎉</h2>
+                    <h2 className="text-2xl font-bold text-slate-800 mb-2 flex items-center justify-center">Quiz Completed! <PartyPopper className="w-6 h-6 ml-2 text-brand-500" /></h2>
                     <p className="text-slate-500 text-lg">Detailed feedback and scoring per question are shown below.</p>
                 </div>
 

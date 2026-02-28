@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import OptionRow from './OptionRow'
 import mediaService from '../../../services/media'
+import { Trash2, X, Image as ImageIcon, TriangleAlert, Plus } from 'lucide-react'
 
 const QuestionCard = ({ question, qIndex, actions }) => {
     const { removeQuestion, handleQuestionChange, addOption } = actions
@@ -39,7 +40,7 @@ const QuestionCard = ({ question, qIndex, actions }) => {
                     onClick={() => removeQuestion(qIndex)}
                     className="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg transition-colors text-sm flex items-center gap-2"
                 >
-                    🗑 Delete Question
+                    <Trash2 className="w-4 h-4" /> Delete Question
                 </button>
             </div>
 
@@ -88,7 +89,7 @@ const QuestionCard = ({ question, qIndex, actions }) => {
                             className="absolute -top-3 -right-3 bg-white text-rose-500 hover:text-white hover:bg-rose-500 rounded-full p-1 shadow-md border border-slate-200 transition-colors w-8 h-8 flex items-center justify-center font-bold"
                             title="Remove image"
                         >
-                            ✕
+                            <X className="w-5 h-5" />
                         </button>
                     </div>
                 ) : (
@@ -101,7 +102,7 @@ const QuestionCard = ({ question, qIndex, actions }) => {
                             <span className="font-semibold animate-pulse">Uploading image...</span>
                         ) : (
                             <>
-                                <span className="text-3xl">🖼️</span>
+                                <ImageIcon className="w-8 h-8 mx-auto mb-2 text-slate-400" />
                                 <span className="font-semibold">Click to browse and upload an image</span>
                                 <span className="text-xs text-slate-400">Max size 20MB.</span>
                             </>
@@ -118,8 +119,8 @@ const QuestionCard = ({ question, qIndex, actions }) => {
                 {question.uiType === 'TEXT' ? (
                     <div className="bg-white border border-slate-200 border-dashed p-6 rounded-lg text-slate-400 text-center italic">
                         [ A text box will appear here for students to type their answer ]<br/>
-                        <span className="text-xs text-amber-600 not-italic font-semibold mt-2 block">
-                            ⚠️ Note: Fill-in-the-blank questions are not auto-graded by the system.
+                        <span className="text-xs text-amber-600 not-italic font-semibold mt-2 block flex items-center justify-center gap-1">
+                            <TriangleAlert className="w-4 h-4 inline-block" /> Note: Fill-in-the-blank questions are not auto-graded by the system.
                         </span>
                     </div>
                 ) : (
@@ -138,7 +139,7 @@ const QuestionCard = ({ question, qIndex, actions }) => {
                             onClick={() => addOption(qIndex)}
                             className="mt-2 text-sm font-bold text-brand-600 hover:text-brand-800 transition-colors flex items-center gap-1 p-2 hover:bg-brand-50 rounded-lg"
                         >
-                            <span>＋</span> Add Option
+                            <Plus className="w-4 h-4" /> Add Option
                         </button>
                     </div>
                 )}

@@ -2,10 +2,9 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
-    BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid,
-    Tooltip as RechartsTooltip, ResponsiveContainer,
     ReferenceLine, PieChart, Pie, Legend
 } from 'recharts'
+import { BarChart2, Hourglass, Download, Inbox, ArrowLeft } from 'lucide-react'
 import analyticsService from '../services/analytics'
 import SearchAutocomplete from '../components/common/SearchAutocomplete'
 
@@ -92,7 +91,7 @@ const AdminResult = ({notify}) => {
     if (isLoading) {
         return (
             <div className="min-h-screen flex justify-center items-center text-xl text-brand-600 font-semibold animate-pulse">
-                📊 Crunching Numbers...
+                <BarChart2 className="w-6 h-6 inline-block mr-2" /> Crunching Numbers...
             </div>
         )
     }
@@ -107,7 +106,7 @@ const AdminResult = ({notify}) => {
                         onClick={() => navigate('/admin/dashboard')}
                         className="text-sm font-bold text-slate-500 hover:text-brand-600 mb-2 transition-colors flex items-center gap-1"
                     >
-                        ← Back to Dashboard
+                        <ArrowLeft className="w-4 h-4 mr-1 inline-block" /> Back to Dashboard
                     </button>
                     <h1 className="text-3xl font-extrabold text-brand-900 tracking-tight">
                         {data.entranceName} Analytics
@@ -123,13 +122,13 @@ const AdminResult = ({notify}) => {
                         ? 'bg-slate-300 cursor-not-allowed'
                         : 'bg-emerald-500 hover:bg-emerald-600 active:scale-95 hover:shadow-md'}`}
                 >
-                    {isExporting ? '⏳ Exporting...' : '📥 Download CSV'}
+                    {isExporting ? <><Hourglass className="w-4 h-4 animate-spin-slow" /> Exporting...</> : <><Download className="w-4 h-4" /> Download CSV</>}
                 </button>
             </div>
 
             {data.totalStudents === 0 ? (
                 <div className="bg-white border border-dashed border-slate-300 rounded-xl p-16 text-center shadow-sm">
-                    <div className="text-5xl mb-4">📭</div>
+                    <div className="text-5xl mb-4 flex justify-center"><Inbox className="w-16 h-16 text-slate-300" /></div>
                     <h3 className="text-xl font-bold text-slate-800 mb-2">No Submissions Yet</h3>
                     <p className="text-slate-500">Wait for students to complete the exam to see analytics and charts.</p>
                 </div>

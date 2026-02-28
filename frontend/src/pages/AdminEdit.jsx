@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAdminEditForm } from "../hooks/useAdminEditForm.js";
 import QuestionCard from "../components/admin/edit/QuestionCard.jsx";
 import quizService from "../services/quizzes.js";
+import { Hourglass, FilePlus, Pencil, Save } from 'lucide-react'
 
 const AdminEdit = ({ notify }) => {
     const { quizId } = useParams()
@@ -137,7 +138,7 @@ const AdminEdit = ({ notify }) => {
     if (isLoading) {
         return (
             <div className="min-h-[60vh] flex justify-center items-center text-xl text-brand-600 font-semibold animate-pulse">
-                ⏳ Loading Quiz Editor...
+                <Hourglass className="w-6 h-6 inline-block mr-2" /> Loading Quiz Editor...
             </div>
         )
     }
@@ -147,8 +148,8 @@ const AdminEdit = ({ notify }) => {
 
             {/* Dynamic Title */}
             <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-extrabold text-brand-900 tracking-tight">
-                    {quizId === 'new' ? '📝 Create New Quiz' : '✏️ Edit Quiz Template'}
+                <h2 className="text-3xl font-extrabold text-brand-900 tracking-tight flex items-center">
+                    {quizId === 'new' ? <><FilePlus className="w-8 h-8 mr-2" /> Create New Quiz</> : <><Pencil className="w-8 h-8 mr-2" /> Edit Quiz Template</>}
                 </h2>
                 <button
                     onClick={() => navigate('/admin/dashboard')}
@@ -240,7 +241,7 @@ const AdminEdit = ({ notify }) => {
                         onClick={handleSubmit}
                         className="px-10 py-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-full shadow-md hover:shadow-lg font-extrabold text-lg transition-all active:scale-95 flex items-center gap-2"
                     >
-                        <span>💾</span> {quizId === 'new' ? 'Save & Create Quiz' : 'Save Changes'}
+                        <Save className="w-5 h-5 mr-1" /> {quizId === 'new' ? 'Save & Create Quiz' : 'Save Changes'}
                     </button>
                 </div>
             </div>

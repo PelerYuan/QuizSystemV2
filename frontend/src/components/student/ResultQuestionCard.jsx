@@ -1,3 +1,5 @@
+import { Check, X } from 'lucide-react'
+
 const ResultQuestionCard = ({q, index, studentAnsObj, pointsPerQuestion}) => {
     const isText = q.itext !== undefined
     const correctCount = q.options?.filter(opt => opt.correct === true || opt.correct === 'true').length || 0
@@ -64,9 +66,9 @@ const ResultQuestionCard = ({q, index, studentAnsObj, pointsPerQuestion}) => {
                                            disabled className="w-5 h-5"/>
                                     <span className="ml-3 font-medium">{optItem.opt}</span>
                                     {isCorrect &&
-                                        <span className="ml-auto text-green-600 text-sm font-bold">✓ Correct</span>}
+                                        <span className="ml-auto text-green-600 text-sm font-bold flex items-center"><Check className="w-4 h-4 mr-1 inline-block" /> Correct</span>}
                                     {isSelected && !isCorrect &&
-                                        <span className="ml-auto text-red-500 text-sm font-bold">✗ Wrong</span>}
+                                        <span className="ml-auto text-red-500 text-sm font-bold flex items-center"><X className="w-4 h-4 mr-1 inline-block" /> Wrong</span>}
                                 </div>
                             )
                         })}

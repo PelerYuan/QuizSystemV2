@@ -5,6 +5,7 @@ import quizService from "./services/quizzes.js";
 import entrancesService from "./services/entrances.js";
 import mediaService from "./services/media.js";
 import analyticsService from "./services/analytics.js";
+import { TriangleAlert } from 'lucide-react'
 
 import Footer from "./components/partials/Footer";
 import Header from "./components/partials/Header";
@@ -39,7 +40,7 @@ const App = () => {
             toast.error(message)
         } else if (type === 'warning') {
             toast(message, {
-                icon: '⚠️',
+                icon: <TriangleAlert className="w-5 h-5 text-amber-600" />,
                 style: {
                     color: '#92400e',
                     backgroundColor: '#fef3c7',

@@ -1,3 +1,5 @@
+import { X } from 'lucide-react'
+
 const OptionRow = ({ option, qIndex, optIndex, uiType, actions }) => {
     const { handleOptionTextChange, toggleCorrectAnswer, removeOption } = actions
 
@@ -27,7 +29,7 @@ const OptionRow = ({ option, qIndex, optIndex, uiType, actions }) => {
                 className="p-3 text-rose-400 hover:text-white hover:bg-rose-500 border border-transparent hover:border-rose-600 rounded-lg transition-colors cursor-pointer"
                 title="Remove Option"
             >
-                ✖
+                <X className="w-5 h-5 flex items-center justify-center m-auto" />
             </button>
         </div>
     )

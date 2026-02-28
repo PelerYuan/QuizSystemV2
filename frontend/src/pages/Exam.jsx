@@ -3,6 +3,7 @@ import {useParams, useNavigate} from 'react-router-dom'
 import examService from '../services/exam'
 import ExamQuestionCard from "../components/student/ExamQuestionCard.jsx"
 import ConfirmDialog from '../components/dialogs/ConfirmDialog'
+import { Hourglass } from 'lucide-react'
 
 import {useModal} from '../hooks/useModal'
 
@@ -104,7 +105,7 @@ const Exam = ({notify}) => {
     }
 
     if (isLoading) return <div
-        className="min-h-screen flex justify-center items-center font-semibold animate-pulse text-brand-600">⏳ Loading
+        className="min-h-screen flex justify-center items-center font-semibold animate-pulse text-brand-600"><Hourglass className="w-5 h-5 inline-block mr-2" /> Loading
         Assessment...</div>
     if (!examData) return null
 
