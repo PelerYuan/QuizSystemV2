@@ -1,11 +1,7 @@
 import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
-import { useState } from "react";
-import toast, {Toaster} from "react-hot-toast";
-import quizService from "./services/quizzes.js";
-import entrancesService from "./services/entrances.js";
-import mediaService from "./services/media.js";
-import analyticsService from "./services/analytics.js";
-import { TriangleAlert } from 'lucide-react'
+import { Toaster } from "react-hot-toast";
+import { useUser } from "./contexts/UserContext.jsx";
+import { useNotification } from "./contexts/NotificationContext.jsx";
 
 import Footer from "./components/partials/Footer";
 import Header from "./components/partials/Header";
@@ -20,47 +16,16 @@ import Result from "./pages/Result";
 import NotFound from "./pages/NotFound";
 
 const App = () => {
-    const [user, setUser] = useState(() => {
-        const loggedUserJSON = window.localStorage.getItem('loggedQuizAdmin')
-        if (loggedUserJSON) {
-            const loggedUser = JSON.parse(loggedUserJSON)
-            quizService.setToken(loggedUser.token)
-            entrancesService.setToken(loggedUser.token)
-            mediaService.setToken(loggedUser.token)
-            analyticsService.setToken(loggedUser.token)
-            return loggedUser
-        }
-        return null
-    });
-
-    const [notification, setNotification] = useState({ message: null, type: 'success' })
-
-    const notify = (message, type = 'success') => {
-        if (type === 'error') {
-            toast.error(message)
-        } else if (type === 'warning') {
-            toast(message, {
-                icon: <TriangleAlert className="w-5 h-5 text-amber-600" />,
-                style: {
-                    color: '#92400e',
-                    backgroundColor: '#fef3c7',
-                    border: '2px solid #f59e0b'
-                }
-            });
-        } else
-         {
-            toast.success(message)
-        }
-    }
+    const { user, logout, isLoading } = useUser();
+    const { notify } = useNotification();
 
     const handleLogout = () => {
-        window.localStorage.removeItem('loggedQuizAdmin')
-        setUser(null)
-        quizService.setToken(null)
-        entrancesService.setToken(null)
-        mediaService.setToken(null)
-        analyticsService.setToken(null)
-        notify('Logged out successfully', 'success')
+        logout();
+        notify('Logged out successfully', 'success');
+    }
+
+    if (isLoading) {
+        return <div className="min-h-screen flex items-center justify-center bg-brand-50">Loading...</div>;
     }
 
     const requireAuth = (element) => {
@@ -77,8 +42,8 @@ const App = () => {
                 <main className="flex-1">
                     <Routes>
                         {/* Public Routes */}
-                        <Route path="/" element={<Home notify={notify}/>} />
-                        <Route path="/exam/:accessCode" element={<Exam notify={notify}/>} />
+                        <Route path="/" element={<Home />} />
+                        <Route path="/exam/:accessCode" element={<Exam />} />
                         <Route path="/result/:submissionId" element={<Result />} />
 
                         {/* Login Route: Redirect to dashboard if already logged in */}
@@ -87,26 +52,26 @@ const App = () => {
                             element={
                                 user
                                     ? <Navigate replace to="/admin/dashboard" />
-                                    : <AdminLogin setUser={setUser} notify={notify} />
+                                    : <AdminLogin />
                             }
                         />
 
                         {/* Private Admin Routes: Wrapped with requireAuth */}
                         <Route
                             path="/admin/dashboard"
-                            element={requireAuth(<AdminDashboard notify={notify} />)}
+                            element={requireAuth(<AdminDashboard />)}
                         />
                         <Route
                             path="/admin/edit/:quizId"
-                            element={requireAuth(<AdminEdit notify={notify} />)}
+                            element={requireAuth(<AdminEdit />)}
                         />
                         <Route
                             path="/admin/trial/:quizId"
-                            element={requireAuth(<AdminTrial notify={notify} />)}
+                            element={requireAuth(<AdminTrial />)}
                         />
                         <Route
                             path="/admin/result/:entranceId"
-                            element={requireAuth(<AdminResult notify={notify} />)}
+                            element={requireAuth(<AdminResult />)}
                         />
 
                         <Route path="*" element={<NotFound />} />

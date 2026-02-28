@@ -5,12 +5,15 @@ import quizService from '../services/quizzes'
 import entrancesService from "../services/entrances.js";
 import mediaService from "../services/media.js";
 import analyticService from "../services/analytics.js";
-import analytics from "../services/analytics.js";
+import { useUser } from '../contexts/UserContext'
+import { useNotification } from '../contexts/NotificationContext'
 
-const AdminLogin = ({ setUser, notify }) => {
+const AdminLogin = () => {
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate()
+    const { login } = useUser()
+    const { notify } = useNotification()
 
     const handleLogin = async (event) => {
         event.preventDefault()
@@ -30,7 +33,7 @@ const AdminLogin = ({ setUser, notify }) => {
             entrancesService.setToken(loggedUser.token)
             mediaService.setToken(loggedUser.token)
             analyticService.setToken(loggedUser.token)
-            setUser(loggedUser)
+            login(loggedUser)
 
             notify('Login successful! Welcome back.', 'success')
             navigate('/admin/dashboard')

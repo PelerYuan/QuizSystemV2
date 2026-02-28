@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef} from 'react'
+import {useState, useEffect, useRef, useCallback} from 'react'
 import {useNavigate} from 'react-router-dom'
 import quizService from '../services/quizzes'
 import entranceService from '../services/entrances'
@@ -7,34 +7,36 @@ import ConfirmDialog from '../components/dialogs/ConfirmDialog'
 import QuizItem from '../components/admin/dashboard/QuizItem'
 
 import {useModal} from '../hooks/useModal'
-
 import {Plus, Import} from "lucide-react";
+import { useNotification } from '../contexts/NotificationContext'
 
-const AdminDashboard = ({notify}) => {
+const AdminDashboard = () => {
     const navigate = useNavigate()
     const [quizzes, setQuizzes] = useState([])
     const [entrances, setEntrances] = useState([])
     const [expandedQuizzes, setExpandedQuizzes] = useState({})
     const fileInputRef = useRef()
+    const { notify } = useNotification()
 
     const createEntranceModal = useModal({quizId: null, quizName: ''})
     const deleteQuizModal = useModal({targetId: null, targetName: ''})
     const deleteEntranceModal = useModal({targetId: null, targetCode: ''})
 
-    useEffect(() => {
-        fetchDashboardData()
-    }, [])
-
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
         try {
             const fetchedQuizzes = await quizService.getAll()
             const fetchedEntrances = await entranceService.getAll()
             setQuizzes(fetchedQuizzes)
             setEntrances(fetchedEntrances)
         } catch (error) {
+            console.error(error)
             notify('Failed to load dashboard data. Please log in again.', 'error')
         }
-    }
+    }, [notify])
+
+    useEffect(() => {
+        fetchDashboardData()
+    }, [fetchDashboardData])
 
     const handleCreateQuiz = () => navigate('/admin/edit/new')
 
@@ -49,6 +51,7 @@ const AdminDashboard = ({notify}) => {
             }))
             notify(`Quiz "${name}" deleted.`, 'success')
         } catch (error) {
+            console.error(error)
             notify('Failed to delete quiz.', 'error')
         } finally {
             deleteQuizModal.close()
@@ -93,6 +96,7 @@ const AdminDashboard = ({notify}) => {
             setEntrances(entrances.concat(newEntrance))
             notify(`New exam session created! Access Code: ${newEntrance.accessCode}`, 'success')
         } catch (error) {
+            console.error(error)
             notify('Failed to create exam session.', 'error')
         }
     }
@@ -104,6 +108,7 @@ const AdminDashboard = ({notify}) => {
             setEntrances(entrances.filter(e => (e.id || e._id) !== id))
             notify(`Session ${code} deleted.`, 'success')
         } catch (error) {
+            console.error(error)
             notify('Failed to delete session.', 'error')
         } finally {
             deleteEntranceModal.close()
@@ -117,6 +122,7 @@ const AdminDashboard = ({notify}) => {
             setEntrances(entrances.map(e => (e.id || e._id) === currentEntId ? updatedEntrance : e))
             notify(`Session is now ${updatedEntrance.isActive ? 'Active' : 'Closed'}`, 'success')
         } catch (error) {
+            console.error(error)
             notify('Failed to update session status.', 'error')
         }
     }

@@ -6,14 +6,16 @@ import ConfirmDialog from '../components/dialogs/ConfirmDialog'
 import { Hourglass } from 'lucide-react'
 
 import {useModal} from '../hooks/useModal'
+import { useNotification } from '../contexts/NotificationContext'
 
-const Exam = ({notify}) => {
+const Exam = () => {
     const {accessCode} = useParams()
     const navigate = useNavigate()
 
     const [examData, setExamData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const { notify } = useNotification()
 
     const [studentName, setStudentName] = useState('')
     const [answers, setAnswers] = useState({})

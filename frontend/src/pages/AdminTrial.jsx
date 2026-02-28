@@ -2,12 +2,14 @@ import {useState, useEffect} from 'react'
 import {useParams, useNavigate, Link} from 'react-router-dom'
 import quizService from '../services/quizzes'
 import TrialQuestionCard from '../components/admin/trial/TrialQuestionCard'
+import { useNotification } from '../contexts/NotificationContext'
 
-const AdminTrial = ({notify}) => {
+const AdminTrial = () => {
     const {quizId} = useParams()
     const navigate = useNavigate()
     const [quiz, setQuiz] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
+    const { notify } = useNotification()
 
     useEffect(() => {
         const fetchQuiz = async () => {
@@ -20,6 +22,7 @@ const AdminTrial = ({notify}) => {
                 const data = await quizService.getOne(quizId)
                 setQuiz(data)
             } catch (error) {
+                console.error(error)
                 notify('Failed to load quiz details.', 'error')
                 navigate('/admin/dashboard')
             } finally {

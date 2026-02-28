@@ -1,19 +1,17 @@
-import axios from 'axios'
-
-const baseUrl = '/api/exam'
+import api from './api'
 
 const getEntrance = async (accessCode) => {
-    const response = await axios.get(`${baseUrl}/entrance/${accessCode}`)
+    const response = await api.get(`/exam/entrance/${accessCode}`)
     return response.data
 }
 
 const submitExam = async (payload) => {
-    const response = await axios.post(`${baseUrl}/submit`, payload)
+    const response = await api.post(`/exam/submit`, payload)
     return response.data
 }
 
 const getResult = async (submissionId) => {
-    const response = await axios.get(`${baseUrl}/result/${submissionId}`)
+    const response = await api.get(`/exam/result/${submissionId}`)
     return response.data
 }
 

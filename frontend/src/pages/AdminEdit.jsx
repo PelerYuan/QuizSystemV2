@@ -4,13 +4,15 @@ import { useAdminEditForm } from "../hooks/useAdminEditForm.js";
 import QuestionCard from "../components/admin/edit/QuestionCard.jsx";
 import quizService from "../services/quizzes.js";
 import { Hourglass, FilePlus, Pencil, Save } from 'lucide-react'
+import { useNotification } from '../contexts/NotificationContext'
 
-const AdminEdit = ({ notify }) => {
+const AdminEdit = () => {
     const { quizId } = useParams()
     const navigate = useNavigate()
 
     const { quiz, handleMetaChange, actions } = useAdminEditForm()
     const [isLoading, setIsLoading] = useState(false)
+    const { notify } = useNotification()
 
     const titleRef = useRef(null)
 
@@ -31,7 +33,7 @@ const AdminEdit = ({ notify }) => {
             }
         }
         fetchExistingQuiz()
-    }, [quizId])
+    }, [quizId, actions, navigate, notify])
 
     const validateForm = () => {
         // 1. 校验标题

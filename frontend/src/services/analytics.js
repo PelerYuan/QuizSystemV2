@@ -1,24 +1,14 @@
-import axios from 'axios'
-
-const baseUrl = '/api/analytics'
-let token = null
-
-const setToken = newToken => {
-    token = `Bearer ${newToken}`
-}
-
+import api from './api'
 const getEntranceAnalytics = async (entranceId) => {
-    const config = { headers: { Authorization: token } }
-    const response = await axios.get(`${baseUrl}/entrance/${entranceId}`, config)
+    const response = await api.get(`/analytics/entrance/${entranceId}`)
     return response.data
 }
 
 const downloadExport = async (entranceId, filename) => {
     const config = {
-        headers: { Authorization: token },
         responseType: 'blob'
     }
-    const response = await axios.get(`${baseUrl}/export/${entranceId}`, config)
+    const response = await api.get(`/analytics/export/${entranceId}`, config)
 
     const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
@@ -29,4 +19,4 @@ const downloadExport = async (entranceId, filename) => {
     link.remove()
 }
 
-export default { setToken, getEntranceAnalytics, downloadExport }
+export default { getEntranceAnalytics, downloadExport }

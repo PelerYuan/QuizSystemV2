@@ -7,8 +7,10 @@ const CreateEntranceDialog = ({isOpen, onClose, onSubmit}) => {
 
     useEffect(() => {
         if (isOpen) {
-            setName(``)
-            setDescription('')
+            setTimeout(() => {
+                setName('')
+                setDescription('')
+            }, 0)
         }
     }, [isOpen])
 

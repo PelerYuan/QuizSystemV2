@@ -22,6 +22,7 @@ const Result = ({notify}) => {
                 const data = await examService.getResult(submissionId)
                 setResultData(data)
             } catch (error) {
+                console.error(error)
                 notify('Failed to load results.', 'error')
                 navigate('/')
             } finally {

@@ -1,40 +1,28 @@
-import axios from 'axios'
-
-const baseUrl = '/api/quizzes'
-
-let token = null
-const setToken = newToken => {
-    token = `Bearer ${newToken}`
-}
+import api from './api'
 
 const getOne = async (id) => {
-    const config = {headers: {Authorization: token}}
-    const response = await axios.get(`${baseUrl}/${id}`, config)
+    const response = await api.get(`/quizzes/${id}`)
     return response.data
 }
 
 const getAll = async () => {
-    const config = {headers: {Authorization: token}}
-    const response = await axios.get(baseUrl, config)
+    const response = await api.get('/quizzes')
     return response.data
 }
 
 const create = async (newObject) => {
-    const config = {headers: {Authorization: token}}
-    const response = await axios.post(baseUrl, newObject, config)
+    const response = await api.post('/quizzes', newObject)
     return response.data
 }
 
 const update = async (id, newObject) => {
-    const config = {headers: {Authorization: token}}
-    const response = await axios.put(`${baseUrl}/${id}`, newObject, config)
+    const response = await api.put(`/quizzes/${id}`, newObject)
     return response.data
 }
 
 const remove = async (id) => {
-    const config = {headers: {Authorization: token}}
-    const response = await axios.delete(`${baseUrl}/${id}`, config)
+    const response = await api.delete(`/quizzes/${id}`)
     return response.data
 }
 
-export default {setToken, getOne, getAll, create, update, remove}
+export default { getOne, getAll, create, update, remove }

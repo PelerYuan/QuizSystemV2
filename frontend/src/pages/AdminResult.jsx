@@ -7,8 +7,9 @@ import {
 import { BarChart2, Hourglass, Download, Inbox, ArrowLeft } from 'lucide-react'
 import analyticsService from '../services/analytics'
 import SearchAutocomplete from '../components/common/SearchAutocomplete'
+import { useNotification } from '../contexts/NotificationContext'
 
-const AdminResult = ({notify}) => {
+const AdminResult = () => {
     const {entranceId} = useParams()
     const navigate = useNavigate()
 
@@ -16,6 +17,7 @@ const AdminResult = ({notify}) => {
     const [isLoading, setIsLoading] = useState(true)
     const [isExporting, setIsExporting] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
+    const { notify } = useNotification()
 
     useEffect(() => {
         const fetchAnalytics = async () => {
@@ -23,6 +25,7 @@ const AdminResult = ({notify}) => {
                 const result = await analyticsService.getEntranceAnalytics(entranceId)
                 setData(result)
             } catch (error) {
+                console.error(error)
                 notify('Failed to load analytics data.', 'error')
                 navigate('/admin/dashboard')
             } finally {
@@ -65,6 +68,7 @@ const AdminResult = ({notify}) => {
             await analyticsService.downloadExport(entranceId, safeFilename)
             notify('Results exported successfully!', 'success')
         } catch (error) {
+            console.error(error)
             notify('Failed to export CSV.', 'error')
         } finally {
             setIsExporting(false)

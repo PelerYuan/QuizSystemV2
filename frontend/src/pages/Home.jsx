@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import examService from '../services/exam.js'
+import { useNotification } from '../contexts/NotificationContext'
 
-const Home = ({ notify }) => {
+const Home = () => {
     const [accessCode, setAccessCode] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate()
+    const { notify } = useNotification()
 
     const handleChange = ({ target }) => {
         const formattedCode = target.value

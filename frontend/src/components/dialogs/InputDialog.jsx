@@ -5,7 +5,11 @@ const InputDialog = ({ isOpen, onClose, onSubmit, title, message, placeholder = 
     const [inputValue, setInputValue] = useState('')
 
     useEffect(() => {
-        if (isOpen) setInputValue('')
+        if (isOpen) {
+            setTimeout(() => {
+                setInputValue('')
+            }, 0)
+        }
     }, [isOpen])
 
     const handleSubmit = (e) => {
