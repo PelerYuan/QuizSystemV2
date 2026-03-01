@@ -22,14 +22,10 @@ touch .env && vi .env
 **Populate the file with the following parameters:**
 
 ```ini
-# Domain & Security Infrastructure
-DOMAIN_NAME=example.com            # Your fully qualified domain name (FQDN)
-SECRET=your_robust_jwt_secret      # High-entropy string for JWT signing
-ADMIN_PASSWORD=your_secure_pass    # Initial administrative credential
-
-# Environment Context
-NODE_ENV=production                # Sets the application to production mode
-```
+# Domain and Security
+DOMAIN_NAME=example.com
+SECRET=your_random_jwt_secret_string
+ADMIN_PASSWORD=your_secure_admin_password
 
 ## 3. SSL/TLS Certificate Provisioning (Initial Setup)
 
@@ -44,7 +40,16 @@ sudo docker compose run --rm certbot certonly \
   -d your_domain_name
 ```
 
-## 4. Full-Stack Service Orchestration
+## 3. Create SSL certificate
+
+```bash
+sudo apt update
+sudo apt install certbot -y
+
+sudo certbot certonly --standalone -d example.com
+```
+
+## 4. Run with Docker
 
 Once the certificates are successfully provisioned to the shared volume, initiate the containerized stack. This command builds and deploys the **Nginx (Reverse Proxy)**, **Frontend**, **Backend API**, and **MongoDB** instances in a decoupled environment.
 
