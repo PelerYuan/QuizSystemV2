@@ -1,25 +1,25 @@
-# Quick Deployment Guide
+# QuizSystemV2 Production Deployment Manual (Force SSL)
 
-This guide covers the rapid deployment of the **QuizSystemV2** monorepo using Docker Compose.
+This guide provides the technical procedure for deploying the **QuizSystemV2** monorepo using **Docker Compose**. This deployment architecture enforces **SSL/TLS encryption** via Certbot to ensure secure end-to-end communication.
 
-## 1. Clone the Repository
+## 1. Repository Acquisition
 
-First, pull the source code onto your production server.
+Begin by cloning the source code into your production environment. Ensure you are on the stable production branch.
 
 ```bash
 git clone https://github.com/PelerYuan/QuizSystemV2.git
 cd QuizSystemV2
 ```
 
-## 2. Configure Environment Variables
+## 2. Environment Configuration
 
-Create a `.env` file in the root directory to store your production secrets.
+The application requires a `.env` file in the root directory to manage sensitive credentials and orchestration variables.
 
 ```bash
-vi .env
+touch .env && vi .env
 ```
 
-Use the template below:
+**Populate the file with the following parameters:**
 
 ```ini
 # Domain and Security
@@ -27,8 +27,17 @@ DOMAIN_NAME=example.com
 SECRET=your_random_jwt_secret_string
 ADMIN_PASSWORD=your_secure_admin_password
 
-# Environment
-NODE_ENV=production
+## 3. SSL/TLS Certificate Provisioning (Initial Setup)
+
+Before orchestrating the full service stack, you must obtain a valid certificate from **Let's Encrypt**. We utilize the `certbot` container to perform a standalone challenge validation.
+
+Execute the following command to initiate the DNS/Standalone challenge:
+
+```bash
+sudo docker compose run --rm certbot certonly \
+  --manual \
+  --preferred-challenges dns \
+  -d your_domain_name
 ```
 
 ## 3. Create SSL certificate
@@ -42,8 +51,18 @@ sudo certbot certonly --standalone -d example.com
 
 ## 4. Run with Docker
 
-Use Docker Compose to build the images and start all services (Nginx, Frontend, Backend, and MongoDB) in the background.
+Once the certificates are successfully provisioned to the shared volume, initiate the containerized stack. This command builds and deploys the **Nginx (Reverse Proxy)**, **Frontend**, **Backend API**, and **MongoDB** instances in a decoupled environment.
 
 ```bash
+# Build images and start services in detached mode
 sudo docker compose up -d --build
 ```
+
+------
+
+### Post-Deployment Verification
+
+To ensure all services are healthy and the reverse proxy is routing traffic correctly, use the following diagnostic commands:
+
+- **Service Status**: `sudo docker compose ps`
+- **Live Log Streaming**: `sudo docker compose logs -f`
