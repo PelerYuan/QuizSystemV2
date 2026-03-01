@@ -21,9 +21,9 @@ vi .env
 
 Use the template below:
 
-```
+```ini
 # Domain and Security
-DOMAIN_NAME=your_domain_name
+DOMAIN_NAME=example.com
 SECRET=your_random_jwt_secret_string
 ADMIN_PASSWORD=your_secure_admin_password
 
@@ -31,7 +31,16 @@ ADMIN_PASSWORD=your_secure_admin_password
 NODE_ENV=production
 ```
 
-## 3. Run with Docker
+## 3. Create SSL certificate
+
+```bash
+sudo apt update
+sudo apt install certbot -y
+
+sudo certbot certonly --standalone -d example.com
+```
+
+## 4. Run with Docker
 
 Use Docker Compose to build the images and start all services (Nginx, Frontend, Backend, and MongoDB) in the background.
 
