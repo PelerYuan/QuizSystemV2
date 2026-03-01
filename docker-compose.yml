@@ -45,3 +45,5 @@ services:
 
 volumes:
   mongo-data:
+  cert_data:
+  cert_challenge:
