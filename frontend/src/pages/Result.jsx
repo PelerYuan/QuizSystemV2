@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react'
-import {useParams, useNavigate, Link} from 'react-router-dom'
+
+import {useParams, useNavigate, Link, useLocation} from 'react-router-dom'
 import examService from '../services/exam'
 import ResultQuestionCard from "../components/student/ResultQuestionCard.jsx";
 import { BarChart2, PartyPopper } from 'lucide-react'
@@ -7,9 +8,13 @@ import { BarChart2, PartyPopper } from 'lucide-react'
 const Result = ({notify}) => {
     const {submissionId} = useParams()
     const navigate = useNavigate()
+    const location = useLocation()
 
     const [resultData, setResultData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
+
+    const backUrl = location.state?.from || '/'
+    const backText = location.state?.from ? 'Back to Analytics' : 'Back to Home'
 
     useEffect(() => {
         const fetchResult = async () => {
@@ -74,10 +79,10 @@ const Result = ({notify}) => {
 
                 <div className="pt-4 pb-12 text-center">
                     <Link
-                        to="/"
+                        to={backUrl}
                         className="inline-block px-12 py-4 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-full shadow-md transition-all active:scale-95"
                     >
-                        Back to Home
+                        {backText}
                     </Link>
                 </div>
             </div>

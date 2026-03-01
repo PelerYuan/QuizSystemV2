@@ -34,10 +34,20 @@ const ChartsPanel = ({ sortedScores, pieData, maxScore, averageScore, searchTerm
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col">
                 <h3 className="text-lg font-bold text-slate-800 mb-2">Score Distribution</h3>
                 <p className="text-xs text-slate-500 mb-4">Percentage based on max score</p>
-                <div className="flex-1 min-h-64">
+
+                <div className="h-80 w-full flex-1">
                     <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value" stroke="none">
+                        <PieChart margin={{ top: 10, bottom: 20 }}>
+                            <Pie
+                                data={pieData}
+                                cx="50%"
+                                cy="53%"
+                                innerRadius={55}
+                                outerRadius={85}
+                                paddingAngle={4}
+                                dataKey="value"
+                                stroke="none"
+                            >
                                 {pieData.map((entry, index) => (
                                     <Cell key={`pie-cell-${index}`} fill={entry.color} />
                                 ))}
