@@ -10,7 +10,8 @@ services:
       - DOMAIN_NAME=${DOMAIN_NAME}
     volumes:
       - ./nginx/nginx.conf.template:/etc/nginx/nginx.conf.template:ro
-      - /etc/letsencrypt:/etc/letsencrypt:rok
+      - cert_data:/etc/letsencrypt:ro
+      - cert_challenge:/var/www/certbot:ro
     depends_on:
       - frontend
       - backend
@@ -35,5 +36,14 @@ services:
     volumes:
       - mongo-data:/data/db
 
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - cert_data:/etc/letsencrypt
+      - cert_challenge:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
 volumes:
   mongo-data:
+  cert_data:
+  cert_challenge:
