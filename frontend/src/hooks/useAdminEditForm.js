@@ -54,19 +54,27 @@ export const useAdminEditForm = (initialData = null) => {
     }
 
     const toggleCorrectAnswer = (qIndex, optIndex) => {
-        const updatedQuestions = [...quiz.questions]
-        const question = updatedQuestions[qIndex]
-        const currentOptions = [...question.options]
+        setQuiz(prevQuiz => {
+            const updatedQuestions = [...prevQuiz.questions]
+            const question = { ...updatedQuestions[qIndex] }
+            const currentOptions = [...question.options]
 
-        if (question.uiType === 'SINGLE') {
-            currentOptions.forEach((o, i) => {
-                currentOptions[i] = {...0, correct: i === optIndex}
-            })
-        } else if (question.uiType === 'MULTIPLE') {
-            currentOptions[optIndex].correct = !currentOptions[optIndex].correct
-        }
-        updatedQuestions[qIndex].options = currentOptions
-        setQuiz({...quiz, questions: updatedQuestions})
+            if (question.uiType === 'SINGLE') {
+                currentOptions.forEach((o, i) => {
+                    currentOptions[i] = { ...o, correct: i === optIndex }
+                })
+            } else if (question.uiType === 'MULTIPLE') {
+                currentOptions[optIndex] = {
+                    ...currentOptions[optIndex],
+                    correct: !currentOptions[optIndex].correct
+                }
+            }
+
+            question.options = currentOptions
+            updatedQuestions[qIndex] = question
+
+            return { ...prevQuiz, questions: updatedQuestions }
+        })
     }
 
     const loadFetchedQuiz = (backendData) => {

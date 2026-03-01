@@ -5,22 +5,26 @@ const Submission = require('../models/submission')
 
 examRouter.get('/entrance/:accessCode', async (request, response) => {
     const accessCode = request.params.accessCode.toUpperCase()
-    const entrance = await Entrance.findOne({ accessCode: accessCode }).populate('quizId')
+    const entrance = await Entrance.findOne({accessCode: accessCode}).populate('quizId')
 
     if (!entrance) {
-        return response.status(404).json({ error: 'Invalid access code' })
+        return response.status(404).json({error: 'Invalid access code'})
     }
     if (!entrance.isActive) {
-        return response.status(403).json({ error: 'This exam session is currently closed' })
+        return response.status(403).json({error: 'This exam session is currently closed'})
     }
     if (!entrance.quizId) {
-        return response.status(404).json({ error: 'Associated quiz template not found' })
+        return response.status(404).json({error: 'Associated quiz template not found'})
     }
 
     const safeQuiz = JSON.parse(JSON.stringify(entrance.quizId))
+
     if (safeQuiz.questions && safeQuiz.questions.questions) {
         safeQuiz.questions.questions.forEach(question => {
-            if (question.options) {
+            if (Array.isArray(question.options)) {
+                const correctCount = question.options.filter(opt => opt.correct === true || opt.correct === 'true').length
+                question.isMultiChoice = correctCount > 1
+
                 question.options.forEach(opt => {
                     delete opt.correct
                 })
@@ -36,18 +40,18 @@ examRouter.get('/entrance/:accessCode', async (request, response) => {
 })
 
 examRouter.post('/submit', async (request, response) => {
-    const { entranceId, studentName, answers } = request.body
+    const {entranceId, studentName, answers} = request.body
 
     if (!entranceId || !studentName || !answers || !answers.questions) {
-        return response.status(400).json({ error: 'entranceId, studentName, and properly formatted answers are required' })
+        return response.status(400).json({error: 'entranceId, studentName, and properly formatted answers are required'})
     }
 
     const entrance = await Entrance.findById(entranceId).populate('quizId')
-    if (!entrance) return response.status(404).json({ error: 'Entrance not found' })
-    if (!entrance.isActive) return response.status(403).json({ error: 'Exam is closed, submissions are no longer accepted' })
+    if (!entrance) return response.status(404).json({error: 'Entrance not found'})
+    if (!entrance.isActive) return response.status(403).json({error: 'Exam is closed, submissions are no longer accepted'})
 
-    const quiz = entrance.quizId
-    const defaultPoint = quiz.questions.points || 1
+    const safeQuiz = JSON.parse(JSON.stringify(entrance.quizId))
+    const defaultPoint = Number(safeQuiz.questions.points) || 1
 
     let calculatedTotalScore = 0
     const gradedAnswers = {
@@ -57,28 +61,39 @@ examRouter.post('/submit', async (request, response) => {
     }
 
     const studentAnswerArray = answers.questions
-    const teacherQuestions = quiz.questions.questions
+    const teacherQuestions = safeQuiz.questions.questions
 
     teacherQuestions.forEach((tQuestion, index) => {
         const sAnswer = studentAnswerArray[index] || {}
         let earnedPoint = 0
 
-        if (tQuestion.options) {
+        if (Array.isArray(tQuestion.options)) {
             const correctOptions = tQuestion.options
-                .filter(opt => opt.correct)
+                .filter(opt => opt.correct === true || opt.correct === 'true')
                 .map(opt => opt.opt)
+
             const studentSelections = sAnswer.selections || []
-            const isCorrect = correctOptions.length === studentSelections.length &&
-                correctOptions.every(val => studentSelections.includes(val))
-            if (isCorrect) {
-                earnedPoint = defaultPoint
+
+            if (correctOptions.length > 0) {
+                const unitPoint = defaultPoint / correctOptions.length
+                let questionScore = 0
+
+                studentSelections.forEach(selection => {
+                    if (correctOptions.includes(selection)) {
+                        questionScore += unitPoint
+                    } else {
+                        questionScore -= unitPoint
+                    }
+                })
+
+                earnedPoint = Math.max(0, Math.min(defaultPoint, questionScore))
             }
+
             gradedAnswers.questions.push({
                 selections: studentSelections,
-                point: earnedPoint
+                point: Number(earnedPoint.toFixed(2))
             })
         }
-
         else if (tQuestion.itext !== undefined) {
             gradedAnswers.questions.push({
                 answer: sAnswer.answer || "",
@@ -89,27 +104,28 @@ examRouter.post('/submit', async (request, response) => {
         calculatedTotalScore += earnedPoint
     })
 
-    gradedAnswers.totalScore = calculatedTotalScore
+    gradedAnswers.totalScore = Number(calculatedTotalScore.toFixed(2))
+
     const submission = new Submission({
         entranceId: entranceId,
         studentName: studentName,
         answers: gradedAnswers,
-        totalScore: calculatedTotalScore
+        totalScore: gradedAnswers.totalScore
     })
     const savedSubmission = await submission.save()
 
-    response.status(201).json({ submissionId: savedSubmission._id })
+    response.status(201).json({submissionId: savedSubmission._id})
 })
 
 examRouter.get('/result/:submissionId', async (request, response) => {
     const submission = await Submission.findById(request.params.submissionId)
         .populate({
             path: 'entranceId',
-            populate: { path: 'quizId' }
-        })
+            populate: {path: 'quizId'}
+        }).lean()
 
     if (!submission) {
-        return response.status(404).json({ error: 'Submission not found' })
+        return response.status(404).json({error: 'Submission not found'})
     }
 
     response.json({

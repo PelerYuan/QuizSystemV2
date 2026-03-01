@@ -58,10 +58,11 @@ Public endpoints for students taking the quiz.
 | `POST` | `/exam/submit`               |       ❌       | `/exam/:accessCode`     | Submits the student's answers (accepts the [Answer Data Format](./answer_format.md) JSON). Calculates the score and returns the generated `submissionId` |
 | `GET`  | `/exam/result/:submissionId` |       ❌       | `/result/:submissionId` | Retrieves a specific student's final score and detailed feedback                                                                                         |
 
-## 6. Media / Uploads (`/media`)
+## 6. Media / Uploads (`/media` & `/uploads`)
 
 Handles static assets like question images.
 
-| Method | Endpoint        | Auth Required | Frontend Route          | Description                                                 |
-|:-------|:----------------|:-------------:|:------------------------|:------------------------------------------------------------|
-| `POST` | `/media/upload` |       ✅       | `/admin/editor/:quizId` | Uploads an image, returning a newly generated UUID filename |
+| Method | Endpoint                 | Auth Required | Frontend Route          | Description                                                                 |
+|:-------|:-------------------------|:-------------:|:------------------------|:----------------------------------------------------------------------------|
+| `POST` | `/media/upload`          |       ✅       | `/admin/editor/:quizId` | Uploads an image, returning a newly generated UUID filename                 |
+| `GET`  | `/uploads/:filename.ext` |       ❌       | (Any view with images)  | Static file server. Directly fetches the uploaded image to render in React. |

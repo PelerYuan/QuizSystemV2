@@ -6,23 +6,39 @@ const config = require('./utils/config')
 
 const MONGODB_URI = config.MONGODB_URI
 
-// Note: This script will WIPE your existing database and seed it with fresh mock data.
+// Random name generator vocabulary
+const firstNames = ['James', 'Mary', 'Robert', 'Patricia', 'John', 'Jennifer', 'Michael', 'Linda', 'David', 'Elizabeth', 'William', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica', 'Thomas', 'Sarah', 'Charles', 'Karen', 'Christopher', 'Nancy', 'Daniel', 'Lisa', 'Matthew'];
+const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee', 'Perez', 'Thompson', 'White', 'Harris'];
+
+const getRandomName = () => {
+    const first = firstNames[Math.floor(Math.random() * firstNames.length)]
+    const last = lastNames[Math.floor(Math.random() * lastNames.length)]
+    return `${first} ${last}`
+}
+
+// Random timestamp generator (simulating submissions within the last 2 hours)
+const getRandomTimestamp = () => {
+    const now = Date.now()
+    const offset = Math.floor(Math.random() * (2 * 60 * 60 * 1000)) // 0 ~ 2 hours
+    return new Date(now - offset)
+}
+
 const seedDatabase = async () => {
     try {
-        console.log('Connecting to MongoDB...')
+        console.log('⏳ Connecting to MongoDB...')
         await mongoose.connect(MONGODB_URI)
-        console.log('Connected to MongoDB successfully.')
+        console.log('✅ Connected to MongoDB successfully.')
 
-        console.log('Clearing existing data...')
+        console.log('🧹 Clearing existing data (Quizzes, Entrances, Submissions)...')
         await Quiz.deleteMany({})
         await Entrance.deleteMany({})
         await Submission.deleteMany({})
-        console.log('Old data cleared.')
+        console.log('✅ Old data cleared.')
 
         // ==========================================
         // 1. Create Quizzes (Templates)
         // ==========================================
-        console.log('Seeding Quizzes...')
+        console.log('📝 Seeding Quizzes...')
         const quiz1 = new Quiz({
             name: 'Python Fundamentals Midterm',
             description: 'Covers variables, loops, and basic data structures.',
@@ -81,12 +97,12 @@ const seedDatabase = async () => {
         // ==========================================
         // 2. Create Entrances (Exam Sessions)
         // ==========================================
-        console.log('Seeding Entrances...')
+        console.log('🚪 Seeding Entrances...')
         const entrance1 = new Entrance({
             quizId: savedQuiz1._id,
             accessCode: 'PYM1',
             name: 'Monday Morning Python Class',
-            description: 'Strictly for Class A students.',
+            description: 'Strictly for Class A students. Analytics will look great here!',
             isActive: true
         })
 
@@ -94,7 +110,7 @@ const seedDatabase = async () => {
             quizId: savedQuiz1._id,
             accessCode: 'PYA2',
             name: 'Afternoon Python Retake',
-            isActive: false // Closed session
+            isActive: false
         })
 
         const entrance3 = new Entrance({
@@ -109,71 +125,87 @@ const seedDatabase = async () => {
         const savedEnt3 = await entrance3.save()
 
         // ==========================================
-        // 3. Create Submissions (Student Answers)
+        // 3. Create Bulk Submissions (Simulate 60 Students)
         // ==========================================
-        console.log('Seeding Submissions...')
+        console.log('👨‍🎓👩‍🎓 Seeding Bulk Submissions for Analytics...')
 
-        // Student 1: Perfect Score on Python Quiz (Entrance 1)
-        const submission1 = new Submission({
-            entranceId: savedEnt1._id,
-            studentName: 'Alice Smith',
-            totalScore: 20, // 10 for Q1, 10 for Q2, 0 for Q3 (subjective)
-            answers: {
-                point: 10,
-                totalScore: 20,
-                questions: [
-                    { selections: ['B. def'], point: 10 },
-                    { selections: ['A. List', 'C. Dictionary'], point: 10 },
-                    { answer: 'print', point: 0 }
-                ]
-            }
-        })
+        const submissionsArray = []
 
-        // Student 2: Failed Python Quiz (Entrance 1)
-        const submission2 = new Submission({
-            entranceId: savedEnt1._id,
-            studentName: 'Bob Jones',
-            totalScore: 0, // Got everything wrong
-            answers: {
-                point: 10,
-                totalScore: 0,
-                questions: [
-                    { selections: ['A. func'], point: 0 },
-                    { selections: ['A. List'], point: 0 }, // Missed C. Dictionary
-                    { answer: 'console.log', point: 0 }
-                ]
-            }
-        })
+        // --- Python Exam Answer Patterns (Max Score: 20) ---
+        const pythonAnswerPatterns = [
+            { s1: ['B. def'], p1: 10, s2: ['A. List', 'C. Dictionary'], p2: 10, text: 'print', score: 20 }, // Perfect
+            { s1: ['B. def'], p1: 10, s2: ['A. List'], p2: 5, text: 'print', score: 15 }, // Half correct multiple choice
+            { s1: ['B. def'], p1: 10, s2: ['B. Tuple'], p2: 0, text: 'printf', score: 10 }, // Wrong multiple choice
+            { s1: ['A. func'], p1: 0, s2: ['A. List', 'C. Dictionary'], p2: 10, text: 'console.log', score: 10 }, // First question wrong
+            { s1: ['C. function'], p1: 0, s2: ['C. Dictionary'], p2: 5, text: 'echo', score: 5 }, // Poor performance
+            { s1: ['A. func'], p1: 0, s2: ['D. String'], p2: 0, text: 'display', score: 0 } // Zero score
+        ]
 
-        // Student 3: Passed React Quiz (Entrance 3)
-        const submission3 = new Submission({
-            entranceId: savedEnt3._id,
-            studentName: 'Charlie Brown',
-            totalScore: 5,
-            answers: {
-                point: 5,
-                totalScore: 5,
-                questions: [
-                    { selections: ['B. useState'], point: 5 }
-                ]
-            }
-        })
+        // Generate 45 Python exam submissions
+        for (let i = 0; i < 45; i++) {
+            // Simulate a realistic distribution (most pass, few perfect/zero scores) using skewed random index
+            const patternIndex = Math.floor(Math.random() * Math.random() * pythonAnswerPatterns.length)
+            const pattern = pythonAnswerPatterns[patternIndex] || pythonAnswerPatterns[2]
 
-        await submission1.save()
-        await submission2.save()
-        await submission3.save()
+            submissionsArray.push({
+                entranceId: savedEnt1._id,
+                studentName: getRandomName(),
+                totalScore: pattern.score,
+                submittedAt: getRandomTimestamp(),
+                answers: {
+                    point: 10,
+                    totalScore: pattern.score,
+                    questions: [
+                        { selections: pattern.s1, point: pattern.p1 },
+                        { selections: pattern.s2, point: pattern.p2 },
+                        { answer: pattern.text, point: 0 }
+                    ]
+                }
+            })
+        }
 
-        console.log('==========================================')
-        console.log('Database seeded successfully! 🌱')
-        console.log('You can now test with the following active Access Codes:')
-        console.log('1. PYM1 (Python Midterm)')
-        console.log('2. RCT1 (React Hooks)')
-        console.log('==========================================')
+        // --- React Exam Answer Patterns (Max Score: 5) ---
+        const reactAnswerPatterns = [
+            { s: ['B. useState'], p: 5 },
+            { s: ['A. useEffect'], p: 0 },
+            { s: ['C. useContext'], p: 0 }
+        ]
 
-        // Gracefully exit the script
+        // Generate 15 React exam submissions
+        for (let i = 0; i < 15; i++) {
+            // 70% correct rate
+            const isCorrect = Math.random() > 0.3
+            const pattern = isCorrect ? reactAnswerPatterns[0] : reactAnswerPatterns[Math.floor(Math.random() * 2) + 1]
+
+            submissionsArray.push({
+                entranceId: savedEnt3._id,
+                studentName: getRandomName(),
+                totalScore: pattern.p,
+                submittedAt: getRandomTimestamp(),
+                answers: {
+                    point: 5,
+                    totalScore: pattern.p,
+                    questions: [
+                        { selections: pattern.s, point: pattern.p }
+                    ]
+                }
+            })
+        }
+
+        // Bulk insert into database
+        await Submission.insertMany(submissionsArray)
+        console.log(`✅ Successfully seeded ${submissionsArray.length} student submissions!`)
+
+        console.log('\n==========================================')
+        console.log('🌟 Database seeded successfully! 🌟')
+        console.log('You can now test Analytics with the following active Access Codes:')
+        console.log('1. PYM1 (Monday Morning Python Class) -> Has 45 submissions')
+        console.log('2. RCT1 (React Weekend Bootcamp) -> Has 15 submissions')
+        console.log('==========================================\n')
+
         process.exit(0)
     } catch (error) {
-        console.error('Error seeding database:', error)
+        console.error('❌ Error seeding database:', error)
         process.exit(1)
     }
 }
