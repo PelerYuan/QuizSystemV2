@@ -34,7 +34,6 @@ const AdminEdit = ({ notify }) => {
     }, [quizId])
 
     const validateForm = () => {
-        // 1. 校验标题
         if (!quiz.title || !quiz.title.trim()) {
             notify('Quiz title is required.', 'error')
             titleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -42,34 +41,28 @@ const AdminEdit = ({ notify }) => {
             return false
         }
 
-        // 2. 校验必须有题目
         if (!quiz.questions || quiz.questions.length === 0) {
             notify('Please add at least one question to the quiz.', 'error')
             return false
         }
 
-        // 3. 深度校验每一道题
         for (let i = 0; i < quiz.questions.length; i++) {
             const q = quiz.questions[i]
             const qElement = document.getElementById(`question-${i}`) // 获取 QuestionCard 绑定的 id
 
-            // 校验题干
             if (!q.Q || !q.Q.trim()) {
                 notify(`Question ${i + 1} text cannot be empty.`, 'error')
                 qElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                 return false
             }
 
-            // 校验选择题
             if (q.uiType !== 'TEXT') {
-                // 必须至少有2个选项
                 if (!q.options || q.options.length < 2) {
                     notify(`Question ${i + 1} must have at least 2 options.`, 'error')
                     qElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                     return false
                 }
 
-                // 选项内容不能有空
                 const hasEmptyOption = q.options.some(opt => !opt.opt || !opt.opt.trim())
                 if (hasEmptyOption) {
                     notify(`Question ${i + 1} has an empty option.`, 'error')
@@ -77,7 +70,6 @@ const AdminEdit = ({ notify }) => {
                     return false
                 }
 
-                // 必须至少有一个正确答案
                 const hasCorrectAnswer = q.options.some(opt => opt.correct === true || opt.correct === 'true')
                 if (!hasCorrectAnswer) {
                     notify(`Question ${i + 1} must have at least one correct answer selected.`, 'error')
@@ -92,7 +84,6 @@ const AdminEdit = ({ notify }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        // 运行校验，如果不通过则中断提交流程
         if (!validateForm()) return
 
         const payload = {
@@ -103,7 +94,6 @@ const AdminEdit = ({ notify }) => {
                 subtitle: quiz.subtitle,
                 points: Number(quiz.points),
                 questions: quiz.questions.map(q => {
-                    // 构建符合后端规范的数据结构
                     const formattedQ = { Q: q.Q }
                     if (q.image) formattedQ.image = q.image
 
@@ -149,7 +139,7 @@ const AdminEdit = ({ notify }) => {
             {/* Dynamic Title */}
             <div className="flex justify-between items-center mb-8">
                 <h2 className="text-3xl font-extrabold text-brand-900 tracking-tight flex items-center">
-                    {quizId === 'new' ? <><FilePlus className="w-8 h-8 mr-2" /> Create New Quiz</> : <><Pencil className="w-8 h-8 mr-2" /> Edit Quiz Template</>}
+                    {quizId === 'new' ? <>Create New Quiz</> : <>Edit Quiz Template</>}
                 </h2>
                 <button
                     onClick={() => navigate('/admin/dashboard')}
