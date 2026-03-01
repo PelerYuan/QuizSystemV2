@@ -9,8 +9,8 @@ services:
     environment:
       - DOMAIN_NAME=${DOMAIN_NAME}
     volumes:
-      - ./nginx/nginx.conf.template:/etc/nginx/nginx.conf.template:ro
-      - /etc/letsencrypt:/etc/letsencrypt:rok
+      - ./nginx/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - frontend
       - backend
